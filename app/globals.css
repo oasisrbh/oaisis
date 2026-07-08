@@ -1,0 +1,102 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ------------------------------------------------------------------ tokens */
+:root {
+  color-scheme: light;
+  --background: #f7f6ef;
+  --foreground: #050505;
+  --primary: #c8ff00;
+  --primary-foreground: #050505;
+  --card: #ffffff;
+  --card-foreground: #050505;
+  --muted: #eeede4;
+  --muted-foreground: #6e7068;
+  --border: #ddddd2;
+  --dark: #050505;
+  --dark-card: #101010;
+  --charcoal: #171717;
+  --lime-glow: rgba(200, 255, 0, 0.35);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-oasis-bg text-oasis-ink antialiased;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  /* Warm off-white with an extremely subtle lime top-light — no pastels */
+  background-image:
+    radial-gradient(1100px 520px at 82% -10%, rgba(200, 255, 0, 0.10), transparent 60%),
+    radial-gradient(900px 460px at 8% -8%, rgba(0, 0, 0, 0.03), transparent 60%);
+  background-attachment: fixed;
+}
+
+/* Thin, subtle scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: #dcdbd0;
+  border-radius: 999px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #c9c8bc;
+  background-clip: content-box;
+}
+
+@layer components {
+  .container-oasis {
+    @apply mx-auto w-full max-w-[1280px] px-5 sm:px-8 lg:px-10;
+  }
+  .pill {
+    @apply inline-flex items-center justify-center rounded-full font-semibold transition;
+  }
+  .card-hover {
+    @apply transition-all duration-300 ease-out hover:-translate-y-1.5 hover:shadow-lift;
+  }
+  /* Frosted glass surface */
+  .glass {
+    @apply border border-white/70 bg-white/70 backdrop-blur-xl;
+    box-shadow: 0 16px 44px -22px rgba(5, 5, 5, 0.16), inset 0 1px 0 0 rgba(255, 255, 255, 0.6);
+  }
+  /* Eyebrow label — muted olive reads editorial on cream */
+  .eyebrow {
+    @apply text-xs font-semibold uppercase tracking-[0.16em];
+    color: #6b7a4a;
+  }
+  .h-display {
+    @apply font-display font-semibold tracking-tightest;
+  }
+  /* Primary lime button */
+  .btn-lime {
+    @apply pill bg-aqua-400 text-oasis-ink transition;
+  }
+  .btn-lime:hover {
+    box-shadow: 0 0 0 1px rgba(200, 255, 0, 0.6), 0 14px 40px -14px var(--lime-glow);
+    transform: translateY(-1px);
+  }
+  /* Dark button */
+  .btn-dark {
+    @apply pill border border-oasis-charcoal bg-oasis-dark text-white transition;
+  }
+  .btn-dark:hover {
+    @apply text-aqua-400;
+    box-shadow: 0 0 0 1px rgba(200, 255, 0, 0.35);
+  }
+}
+
+@layer utilities {
+  .dots {
+    background-image: radial-gradient(currentColor 1px, transparent 1px);
+    background-size: 12px 12px;
+  }
+  .text-balance {
+    text-wrap: balance;
+  }
+}
