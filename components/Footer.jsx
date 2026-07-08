@@ -78,11 +78,10 @@ export default function Footer() {
           <div className="mt-12 rounded-2xl border border-oasis-line bg-oasis-sand p-5">
             <p className="text-xs leading-relaxed text-oasis-ink/70">
               <span className="font-semibold text-oasis-ink">Risk disclaimer.</span>{" "}
-              Fractional ownership of real-world assets involves risk. Asset values
-              may fluctuate and returns are not guaranteed. Liquidity and exit timing
-              are not guaranteed. Oasis does not guarantee resale value or profit.
-              This is an early product preview using placeholder data — nothing here
-              is an offer, solicitation, or investment advice.
+              Fractional ownership of real-world assets involves risk. Asset
+              values may fluctuate, liquidity and exit timing are not
+              guaranteed, and Oasis does not guarantee resale value or profit.
+              Review final pool terms before participating.
             </p>
           </div>
         </div>

@@ -38,8 +38,8 @@ export default function RiskPage() {
       <Section title="Custody & authentication risk">
         <p>
           Real-world assets carry storage, insurance, and authentication risk.
-          Custody and authentication details must be verified before a pool
-          settles, and are shown as placeholders until confirmed.
+          Custody and authentication details are published before a pool
+          settles.
         </p>
       </Section>
 

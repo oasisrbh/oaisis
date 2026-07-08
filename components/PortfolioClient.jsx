@@ -13,15 +13,23 @@ import {
   ArrowUpRight,
   Coins,
   Archive,
+  Calendar,
 } from "lucide-react";
 import StatusBadge from "@/components/StatusBadge";
 import CountdownTimer from "@/components/CountdownTimer";
 import { useWallet } from "@/components/WalletProvider";
 import ConnectButton from "@/components/ConnectButton";
 import BrandLogo from "@/components/BrandLogo";
-import { portfolio, genesisDrops, formatUsd, GENESIS_LAUNCH_DATE } from "@/lib/data";
+import {
+  portfolio,
+  genesisDrops,
+  formatUsd,
+  GENESIS_LAUNCH_DATE,
+  GENESIS_LAUNCH_LABEL,
+} from "@/lib/data";
 
 const SEGMENT_COLORS = ["#c8ff00", "#8B9B6E", "#B7B7AD", "#d8c98e"];
+const OPEN_DROPS = genesisDrops.filter((a) => !a.isLocked);
 
 function LockedBadge() {
   return (
@@ -41,7 +49,7 @@ export default function PortfolioClient() {
   const stats = [
     { icon: Wallet, label: "Wallet status", value: "Connected" },
     { icon: Layers, label: "Genesis pools", value: genesisDrops.length },
-    { icon: Clock, label: "Launching soon", value: launchingCount },
+    { icon: Clock, label: "Opening soon", value: launchingCount },
     { icon: Lock, label: "Locked drops", value: lockedCount },
     { icon: Heart, label: "Watchlist", value: genesisDrops.length },
   ];
@@ -62,11 +70,12 @@ export default function PortfolioClient() {
               Your Oasis portfolio
             </h1>
             <span className="pill gap-1.5 bg-aqua-400 px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-oasis-ink">
-              <Clock size={12} /> Launching in 2.5 weeks
+              <Calendar size={12} /> Genesis launches {GENESIS_LAUNCH_LABEL}
             </span>
           </div>
           <p className="mt-2 max-w-xl text-sm text-oasis-muted">
-            Track your watchlist, Genesis pool status, and ownership once Oasis launches.
+            Track your watchlist, Genesis pool status, and ownership activity
+            from one wallet-native dashboard.
           </p>
         </div>
         <div className="flex flex-col items-start gap-3 lg:items-end">
@@ -74,7 +83,7 @@ export default function PortfolioClient() {
             <span className="h-2 w-2 rounded-full bg-aqua-400" /> {address}
           </span>
           <div className="w-full sm:w-[300px]">
-            <CountdownTimer targetDate={GENESIS_LAUNCH_DATE} label="Genesis launch in" />
+            <CountdownTimer targetDate={GENESIS_LAUNCH_DATE} label="Genesis launches in" />
           </div>
         </div>
       </motion.div>
@@ -88,7 +97,7 @@ export default function PortfolioClient() {
 
       {/* Main 3-column grid */}
       <div className="mt-6 grid gap-5 lg:grid-cols-[320px_1fr_340px]">
-        <ContributionPreview />
+        <ContributionEstimate />
         <GenesisPoolStatus />
         <OwnershipAllocation />
       </div>
@@ -198,13 +207,13 @@ function StatCard({ icon: Icon, label, value, delay }) {
   );
 }
 
-// ------------------------------------------------------ contribution preview
-function ContributionPreview() {
-  const first = genesisDrops.find((a) => !a.isLocked) || genesisDrops[0];
+// ------------------------------------------------------ contribution estimate
+function ContributionEstimate() {
+  const first = OPEN_DROPS[0];
   const [id, setId] = useState(first.id);
   const [amount, setAmount] = useState(500);
   const [joined, setJoined] = useState(false);
-  const asset = genesisDrops.find((a) => a.id === id) || first;
+  const asset = OPEN_DROPS.find((a) => a.id === id) || first;
   const ownership = ((Number(amount) || 0) / asset.poolSize) * 100;
 
   return (
@@ -218,7 +227,7 @@ function ContributionPreview() {
         <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-aqua-50 text-aqua-600">
           <Coins size={18} />
         </span>
-        <h3 className="text-lg font-bold text-oasis-ink">Contribution preview</h3>
+        <h3 className="text-lg font-bold text-oasis-ink">Contribution estimate</h3>
       </div>
 
       <label className="mt-5 block text-xs font-semibold uppercase tracking-wide text-oasis-muted">
@@ -229,7 +238,7 @@ function ContributionPreview() {
         onChange={(e) => setId(e.target.value)}
         className="mt-2 w-full rounded-2xl border border-oasis-line bg-oasis-bg/60 px-4 py-3 text-sm font-semibold text-oasis-ink outline-none transition focus:border-aqua-300"
       >
-        {genesisDrops.map((a) => (
+        {OPEN_DROPS.map((a) => (
           <option key={a.id} value={a.id}>{a.name}</option>
         ))}
       </select>
@@ -252,7 +261,7 @@ function ContributionPreview() {
         <p className="text-[11px] uppercase tracking-wide text-white/60">Estimated ownership</p>
         <p className="mt-1 text-2xl font-bold">{ownership.toFixed(2)}%</p>
         <p className="mt-1 text-xs text-white/50">
-          Pool share preview — {ownership.toFixed(2)}% of {formatUsd(asset.poolSize)}
+          Pool share estimate — {ownership.toFixed(2)}% of {formatUsd(asset.poolSize)}
         </p>
       </div>
 
@@ -269,7 +278,8 @@ function ContributionPreview() {
         </button>
       )}
       <p className="mt-3 text-center text-[11px] text-oasis-muted">
-        Preview only. Contributions open when the Genesis pool launches.
+        Estimate only. Final ownership is confirmed after pool settlement.
+        Genesis pool opens {GENESIS_LAUNCH_LABEL}.
       </p>
     </motion.div>
   );
@@ -295,15 +305,9 @@ function GenesisPoolStatus() {
                 </span>
                 <LockedBadge />
               </div>
-              <div className="mt-2.5 flex items-center justify-between">
-                <div>
-                  <p className="text-[10px] uppercase tracking-wide text-oasis-muted">Pool size</p>
-                  <p className="select-none text-sm font-bold text-oasis-ink/80 blur-[6px]">
-                    {formatUsd(a.poolSize)}
-                  </p>
-                </div>
-                <span className="text-xs text-oasis-muted">Full details revealed at launch</span>
-              </div>
+              <p className="mt-2.5 text-xs text-oasis-muted">
+                Details unlock {GENESIS_LAUNCH_LABEL}.
+              </p>
             </div>
           ) : (
             <Link
@@ -320,8 +324,8 @@ function GenesisPoolStatus() {
               </div>
               <div className="mt-3 flex flex-wrap items-center gap-x-6 gap-y-2">
                 <div>
-                  <p className="text-[10px] uppercase tracking-wide text-oasis-muted">Launches in</p>
-                  <p className="text-sm font-bold text-oasis-ink">17d 12h</p>
+                  <p className="text-[10px] uppercase tracking-wide text-oasis-muted">Launches</p>
+                  <p className="text-sm font-bold text-oasis-ink">{GENESIS_LAUNCH_LABEL}</p>
                 </div>
                 <div>
                   <p className="text-[10px] uppercase tracking-wide text-oasis-muted">Pool size</p>
@@ -356,13 +360,13 @@ function OwnershipAllocation() {
           <div className="flex h-16 w-16 items-center justify-center rounded-2xl border border-aqua-400/20 bg-oasis-dark/70">
             <BrandLogo variant="icon" size="md" />
           </div>
-          <p className="mt-4 text-base font-bold">No ownership yet</p>
+          <p className="mt-4 text-base font-bold">No ownership positions yet</p>
           <p className="mt-1 text-sm leading-relaxed text-white/55">
-            Your allocation will appear here after you join a live pool.
+            Positions appear here after you participate in an open pool.
           </p>
         </div>
 
-        {/* faint placeholder segments — no percentages */}
+        {/* faint segments — names only, no percentages */}
         <div className="mt-6 space-y-2.5 border-t border-white/10 pt-5">
           {genesisDrops.map((a, i) => (
             <div key={a.id} className="flex items-center gap-2.5 opacity-40">
@@ -383,7 +387,7 @@ function OwnershipAllocation() {
 function NotConnected() {
   return (
     <div className="container-oasis relative pt-12">
-      {/* Blurred preview dashboard behind */}
+      {/* Full dashboard shape, blurred behind the connect card */}
       <div className="pointer-events-none absolute inset-x-0 top-12 select-none px-5 opacity-60 blur-[7px] sm:px-8 lg:px-10" aria-hidden="true">
         <div className="mx-auto max-w-[1200px]">
           <div className="grid grid-cols-2 gap-4 md:grid-cols-5">
@@ -422,7 +426,7 @@ function NotConnected() {
           </h1>
           <p className="mt-3 text-sm leading-relaxed text-oasis-muted">
             Track your watchlist and Genesis pool status. Ownership appears here
-            once Oasis launches.
+            after you participate in an open pool.
           </p>
           <div className="mt-7 flex justify-center">
             <ConnectButton variant="cyan" className="px-6 py-3 text-[15px]" />

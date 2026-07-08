@@ -29,7 +29,7 @@ import {
 } from "lucide-react";
 import StatusBadge from "@/components/StatusBadge";
 import RobinhoodChainBadge from "@/components/RobinhoodChainBadge";
-import { genesisDrops, formatUsd } from "@/lib/data";
+import { genesisDrops, GENESIS_LAUNCH_LABEL } from "@/lib/data";
 
 const SECTIONS = [
   { id: "overview", label: "Overview" },
@@ -52,11 +52,11 @@ const QUICK = [
 const FAQS = [
   {
     q: "Is Oasis live yet?",
-    a: "Oasis is currently in Genesis launch mode. The first pool is scheduled to open in 2.5 weeks.",
+    a: `Yes. Oasis is live. The first Genesis pool opens ${GENESIS_LAUNCH_LABEL}.`,
   },
   {
     q: "What does a locked drop mean?",
-    a: "Locked drops are upcoming Genesis assets. Full pool details are revealed closer to launch.",
+    a: "Locked drops are Genesis assets with details revealed at or after launch.",
   },
   {
     q: "Are returns guaranteed?",
@@ -64,11 +64,11 @@ const FAQS = [
   },
   {
     q: "Is Oasis officially partnered with Robinhood?",
-    a: "Oasis is built for Robinhood Chain, but does not claim official Robinhood partnership, endorsement, or affiliation unless separately announced.",
+    a: "Oasis is built on Robinhood Chain, but does not claim official Robinhood partnership, endorsement, or affiliation unless separately announced.",
   },
   {
     q: "Where are assets stored?",
-    a: "Custody details are shown as placeholders until verified information is added before pool settlement.",
+    a: "Custody and authentication details are published before pool settlement.",
   },
   {
     q: "What happens after I join a pool?",
@@ -97,9 +97,9 @@ export default function DocsClient() {
 
   const heroStats = [
     { value: genesisDrops.length, label: "Genesis pools" },
-    { value: launchingCount, label: "Live soon" },
+    { value: launchingCount, label: "Opens July 26" },
     { value: lockedCount, label: "Locked drops" },
-    { value: "2.5 wks", label: "Launch" },
+    { value: "Robinhood", label: "Chain" },
   ];
 
   // Scroll-spy for active sidebar item
@@ -138,8 +138,8 @@ export default function DocsClient() {
             Oasis docs
           </h1>
           <p className="mt-4 max-w-2xl text-[16px] leading-relaxed text-oasis-muted">
-            Everything you need to understand Oasis, Genesis pools, locked drops,
-            wallet tracking, and Robinhood Chain launch mechanics.
+            Everything you need to understand Oasis, Genesis pools, locked
+            drops, wallet tracking, and Robinhood Chain.
           </p>
         </div>
 
@@ -272,7 +272,8 @@ export default function DocsClient() {
           {/* 3. Genesis drops */}
           <DocSection id="genesis-drops" eyebrow="Launch set" icon={Sparkles} title="Genesis drops">
             <p className="text-[15px] leading-relaxed text-oasis-muted">
-              One pool opens first. Three locked drops reveal details after launch.
+              One Genesis pool opens {GENESIS_LAUNCH_LABEL}. Three locked drops
+              unlock after launch.
             </p>
             <div className="mt-5 rounded-2xl border border-oasis-line bg-oasis-bg/50 p-5">
               <p className="text-sm font-bold text-oasis-ink">Genesis launch set</p>
@@ -302,21 +303,20 @@ export default function DocsClient() {
               <TimelineRow n="4" title="After settlement" body="Final ownership is confirmed." />
             </div>
             <p className="mt-4 inline-flex items-center gap-2 rounded-full bg-aqua-50 px-3 py-1.5 text-[12px] font-semibold text-aqua-700">
-              <Info size={13} /> Contribution screens are preview-only until the Genesis pool opens.
+              <Info size={13} /> Genesis pool opens {GENESIS_LAUNCH_LABEL}.
             </p>
           </DocSection>
 
           {/* 5. Custody & authentication */}
           <DocSection id="custody" eyebrow="Trust" icon={ShieldCheck} title="Custody & authentication">
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-              <DocCard icon={FileCheck2} title="Authentication report" />
-              <DocCard icon={FileText} title="Condition report" />
-              <DocCard icon={Package} title="Custody record" />
-              <DocCard icon={Receipt} title="Purchase record" />
+              <DocCard icon={FileCheck2} title="Authentication report" status="Pending publication" />
+              <DocCard icon={FileText} title="Condition report" status="Pending publication" />
+              <DocCard icon={Package} title="Custody record" status="Pending publication" />
+              <DocCard icon={Receipt} title="Purchase record" status="Restricted" />
             </div>
             <p className="mt-4 text-[14px] leading-relaxed text-oasis-muted">
-              Custody and authentication information is shown as placeholder data
-              until verified details are added before pool settlement.
+              Custody and authentication details are published before pool settlement.
             </p>
           </DocSection>
 
@@ -417,18 +417,18 @@ function StepCard({ n, icon: Icon, title, body }) {
   );
 }
 
-function DocCard({ icon: Icon, title }) {
+function DocCard({ icon: Icon, title, status }) {
   return (
     <div className="flex flex-col rounded-2xl border border-oasis-line bg-oasis-bg/50 p-4">
       <div className="flex items-center justify-between">
         <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white text-oasis-ink shadow-soft">
           <Icon size={17} />
         </div>
-        <Lock size={13} className="text-oasis-muted" />
+        {status === "Restricted" && <Lock size={13} className="text-oasis-muted" />}
       </div>
       <p className="mt-3 text-sm font-bold text-oasis-ink">{title}</p>
       <span className="mt-2 inline-flex w-fit rounded-full bg-oasis-sand px-2 py-0.5 text-[10px] font-semibold text-oasis-muted">
-        Placeholder
+        {status}
       </span>
     </div>
   );

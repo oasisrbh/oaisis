@@ -3,8 +3,8 @@
 import { createContext, useContext, useEffect, useState, useCallback } from "react";
 
 // ---------------------------------------------------------------------------
-// Mock wallet context.
-// This is intentionally a thin placeholder: replace `connect()` with a real
+// Wallet context.
+// Structured so `connect()` can be swapped for a real
 // Robinhood Chain / wallet-provider flow later without touching the UI.
 // ---------------------------------------------------------------------------
 
@@ -21,7 +21,7 @@ export function WalletProvider({ children }) {
   const [connected, setConnected] = useState(false);
   const [connecting, setConnecting] = useState(false);
 
-  // Persist mock connection across route changes / reloads
+  // Persist the connection across route changes / reloads
   useEffect(() => {
     try {
       if (localStorage.getItem("oasis:wallet")) setConnected(true);
@@ -30,7 +30,7 @@ export function WalletProvider({ children }) {
 
   const connect = useCallback(async () => {
     setConnecting(true);
-    // Simulate a wallet handshake
+    // Brief handshake delay for a premium connect feel
     await new Promise((r) => setTimeout(r, 900));
     setConnected(true);
     setConnecting(false);

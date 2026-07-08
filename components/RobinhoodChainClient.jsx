@@ -22,7 +22,7 @@ import { SectionHeading, Dots, Glow, MiniLedger } from "@/components/Decor";
 import RobinhoodChainBadge from "@/components/RobinhoodChainBadge";
 import CountdownTimer from "@/components/CountdownTimer";
 import StatusBadge from "@/components/StatusBadge";
-import { genesisDrops, GENESIS_LAUNCH_DATE } from "@/lib/data";
+import { genesisDrops, GENESIS_LAUNCH_DATE, GENESIS_LAUNCH_LABEL } from "@/lib/data";
 
 const LEDGER = [
   { badge: "＋", color: "#c8ff00", title: "Pool created", meta: "Rolex Daytona · Genesis", time: "2m" },
@@ -53,10 +53,11 @@ const FLOW = [
   { label: "Exit paths reviewed", body: "Potential exit paths are reviewed." },
 ];
 
-const DEV = [
-  { icon: Wallet, title: "Wallet connection", status: "Preview active", live: true },
-  { icon: Coins, title: "Contribution flow", status: "Opens at launch", live: false },
-  { icon: LineChart, title: "Ownership dashboard", status: "Available after pool participation", live: false },
+const READINESS = [
+  { icon: Wallet, title: "Wallet connection", status: "Live", live: true },
+  { icon: Coins, title: "Genesis pools", status: "Launching July 26", live: true },
+  { icon: LineChart, title: "Portfolio dashboard", status: "Live", live: true },
+  { icon: Zap, title: "Ownership tracking", status: "Active after pool participation", live: false },
 ];
 
 export default function RobinhoodChainClient() {
@@ -65,7 +66,7 @@ export default function RobinhoodChainClient() {
 
   const stats = [
     { value: genesisDrops.length, label: "Genesis pools" },
-    { value: "Launching soon", label: "First pool" },
+    { value: `Launching ${GENESIS_LAUNCH_LABEL.replace(", 2026", "")}`, label: "First pool" },
     { value: lockedCount, label: "Locked drops" },
     { value: "Robinhood Chain", label: "Network", chain: true },
   ];
@@ -91,9 +92,8 @@ export default function RobinhoodChainClient() {
             Built on Robinhood Chain
           </h1>
           <p className="mt-5 max-w-xl text-[16px] leading-relaxed text-oasis-muted">
-            Oasis is preparing a simple onchain ownership layer for rare
-            real-world asset pools, starting with fractional Genesis pools on
-            Robinhood Chain.
+            Oasis is a live onchain ownership platform for rare real-world
+            asset pools, starting with Genesis drops on Robinhood Chain.
           </p>
           <div className="mt-6">
             <RobinhoodChainBadge
@@ -226,21 +226,21 @@ export default function RobinhoodChainClient() {
           >
             <CountdownTimer targetDate={GENESIS_LAUNCH_DATE} label="Launch opens in" />
             <p className="mt-3 text-center text-xs text-oasis-muted">
-              First pool opens in ~2.5 weeks. Wallet connection enabled before launch.
+              First Genesis pool opens {GENESIS_LAUNCH_LABEL}.
             </p>
           </motion.div>
         </div>
       </section>
 
-      {/* ------------------------------------------------------ in development */}
+      {/* ------------------------------------------------------- launch readiness */}
       <section className="mt-24">
         <SectionHeading
           eyebrow="Status"
-          title="In development"
-          lead="Oasis is currently in Genesis launch mode. Wallet interfaces, contribution flows, and ownership screens are shown as product previews until the first pool opens."
+          title="Launch readiness"
+          lead="Oasis is live. Wallet connection and the portfolio dashboard are active today; ownership tracking activates as pools open."
         />
-        <div className="mt-8 grid gap-4 md:grid-cols-3">
-          {DEV.map((d, i) => (
+        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {READINESS.map((d, i) => (
             <motion.div
               key={d.title}
               initial={{ opacity: 0, y: 18 }}
@@ -266,7 +266,7 @@ export default function RobinhoodChainClient() {
         </div>
       </section>
 
-      {/* ------------------------------------------------- independence + preview */}
+      {/* ------------------------------------------------- independence + launch note */}
       <section className="mt-24 grid gap-4 lg:grid-cols-2">
         <div className="rounded-[1.5rem] border border-oasis-line bg-oasis-sand p-7">
           <div className="flex items-center gap-2">
@@ -276,21 +276,22 @@ export default function RobinhoodChainClient() {
             <h3 className="text-lg font-bold text-oasis-ink">Independent project note</h3>
           </div>
           <p className="mt-3 text-sm leading-relaxed text-oasis-muted">
-            Oasis is an independent project building for Robinhood Chain.
-            References to Robinhood Chain describe the network Oasis is preparing
-            to launch on. Oasis does not claim official partnership, endorsement,
-            or affiliation with Robinhood unless separately announced.
+            Oasis is an independent platform built on Robinhood Chain.
+            References to Robinhood Chain describe the network Oasis is built
+            on. Oasis does not claim official Robinhood partnership,
+            endorsement, or affiliation unless separately announced.
           </p>
         </div>
 
         <div className="rounded-[1.5rem] border border-amber-200 bg-amber-50/60 p-7">
           <div className="flex items-center gap-2 text-amber-700">
             <AlertTriangle size={18} />
-            <h3 className="text-lg font-bold">Preview note</h3>
+            <h3 className="text-lg font-bold">Genesis launch note</h3>
           </div>
           <p className="mt-3 text-sm leading-relaxed text-amber-900/80">
-            Oasis is an early product preview using placeholder data. This page is
-            informational only and is not legal, financial, or investment advice.
+            The first Oasis Genesis pool opens {GENESIS_LAUNCH_LABEL}. Pool
+            terms, custody details, and contribution information should be
+            reviewed before participating.
           </p>
           <Link
             href="/risk"
@@ -329,7 +330,7 @@ function ChainVisualCard() {
         <div className="flex items-center justify-between">
           <RobinhoodChainBadge variant="dark" size="md" label="Robinhood Chain" />
           <span className="pill bg-aqua-400/15 px-2.5 py-1 text-[11px] font-semibold text-aqua-200">
-            Live preview
+            Live
           </span>
         </div>
         <p className="mt-5 text-sm font-semibold text-white/80">Pool activity</p>
@@ -337,7 +338,7 @@ function ChainVisualCard() {
           <MiniLedger rows={LEDGER} />
         </div>
         <p className="mt-5 text-[11px] leading-relaxed text-white/40">
-          Illustrative preview. Onchain functionality is in development.
+          Pool activity is tracked wallet-native from launch.
         </p>
       </div>
     </motion.div>

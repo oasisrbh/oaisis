@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import { SectionHeading, Dots, Glow, MiniLedger } from "@/components/Decor";
 import RobinhoodChainBadge from "@/components/RobinhoodChainBadge";
-import { LIFECYCLE } from "@/lib/data";
+import { LIFECYCLE, GENESIS_LAUNCH_LABEL } from "@/lib/data";
 
 // -------------------------------------------------------------- Why collectors
 const WHY = [
@@ -161,9 +161,9 @@ const CHAIN_CARDS = [
 ];
 
 const LEDGER = [
-  { badge: "＋", color: "#c8ff00", title: "Pool joined", meta: "Rolex Daytona · $500", time: "2m" },
-  { badge: "％", color: "#c8ff00", title: "Ownership updated", meta: "0.74% acquired", time: "2m" },
-  { badge: "✓", color: "#c8ff00", title: "Asset funded", meta: "Hermès Birkin · 100%", time: "1h" },
+  { badge: "＋", color: "#c8ff00", title: "Wallet connected", meta: "Genesis dashboard", time: "2m" },
+  { badge: "☆", color: "#c8ff00", title: "Watchlist added", meta: "Rolex Daytona Panda", time: "8m" },
+  { badge: "◐", color: "#8B9B6E", title: "Genesis pool opens", meta: GENESIS_LAUNCH_LABEL, time: "—" },
 ];
 
 export function ChainSection() {
@@ -178,11 +178,11 @@ export function ChainSection() {
           <div>
             <RobinhoodChainBadge variant="dark" size="md" label="Robinhood Chain" />
             <h2 className="mt-4 text-balance text-[30px] leading-[1.06] h-display sm:text-[38px]">
-              RWA pools, built for Robinhood Chain
+              RWA pools, built on Robinhood Chain
             </h2>
             <p className="mt-4 max-w-xl text-[15px] leading-relaxed text-white/70">
-              Oasis is preparing a simple onchain ownership layer for rare
-              real-world assets, starting with fractional pools on Robinhood Chain.
+              Oasis is a simple onchain ownership layer for rare real-world
+              assets, starting with Genesis pools on Robinhood Chain.
             </p>
 
             <div className="mt-8 grid gap-3 sm:grid-cols-2">
@@ -224,14 +224,14 @@ export function ChainSection() {
                 <span className="text-sm font-semibold">Pool activity</span>
               </div>
               <span className="pill bg-aqua-400/15 px-2.5 py-1 text-[11px] font-semibold text-aqua-200">
-                Live preview
+                Live
               </span>
             </div>
             <div className="mt-5">
               <MiniLedger rows={LEDGER} />
             </div>
             <p className="mt-5 text-[11px] leading-relaxed text-white/40">
-              Illustrative preview. Onchain functionality is in development.
+              Pool activity is tracked wallet-native from launch.
             </p>
           </motion.div>
         </div>

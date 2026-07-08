@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { ArrowRight, Sparkles } from "lucide-react";
 import AssetCard from "@/components/AssetCard";
 import RobinhoodChainBadge from "@/components/RobinhoodChainBadge";
-import { genesisDrops } from "@/lib/data";
+import { genesisDrops, GENESIS_LAUNCH_LABEL } from "@/lib/data";
 
 const TABS = ["Featured", "Watches", "Sneakers", "Bags", "Collectibles"];
 
@@ -37,8 +37,8 @@ export default function LatestDrops() {
           First Oasis pools
         </h2>
         <p className="mt-3 text-[15px] leading-relaxed text-oasis-muted">
-          One pool launching soon. Three locked drops. Built for rare asset
-          ownership on Robinhood Chain.
+          First Genesis pool launches {GENESIS_LAUNCH_LABEL}. Three locked drops
+          unlock after launch. Built for rare asset ownership on Robinhood Chain.
         </p>
       </div>
 

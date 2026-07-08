@@ -2,7 +2,7 @@ import { InfoPage, Section, List } from "@/components/InfoPage";
 
 export const metadata = {
   title: "Privacy Policy — Oasis",
-  description: "How Oasis handles information in this product preview.",
+  description: "How Oasis handles information on the platform.",
 };
 
 export default function PrivacyPage() {
@@ -11,13 +11,13 @@ export default function PrivacyPage() {
       eyebrow="Legal"
       title="Privacy Policy"
       updated="July 8, 2026"
-      intro="This placeholder policy explains how Oasis handles information during the product preview. We aim to collect as little as possible."
+      intro="This policy explains how Oasis handles information. We aim to collect as little as possible."
     >
       <Section title="Information we collect">
         <List
           items={[
             "Wallet address — a public identifier if you connect a wallet.",
-            "Basic usage data — pages viewed and interactions, to improve the preview.",
+            "Basic usage data — pages viewed and interactions, to improve the platform.",
             "Anything you voluntarily provide, such as a waitlist email.",
           ]}
         />
@@ -25,33 +25,33 @@ export default function PrivacyPage() {
 
       <Section title="Wallet data">
         <p>
-          A connected wallet address is public information. In this preview,
-          wallet connection is simulated and no private keys are ever requested,
-          stored, or transmitted.
+          A connected wallet address is public information. Wallet connection
+          uses your browser's local storage to remember your session; no
+          private keys are ever requested, stored, or transmitted.
         </p>
       </Section>
 
       <Section title="How we use information">
         <p>
-          We use information to operate and improve the preview, communicate about
-          the Genesis launch, and keep the product secure. We do not sell your
-          personal information.
+          We use information to operate and improve the platform, communicate
+          about the Genesis launch, and keep the product secure. We do not sell
+          your personal information.
         </p>
       </Section>
 
       <Section title="Cookies & analytics">
         <p>
           Oasis may use minimal local storage and privacy-conscious analytics to
-          understand how the preview is used. You can clear local storage in your
-          browser at any time.
+          understand how the platform is used. You can clear local storage in
+          your browser at any time.
         </p>
       </Section>
 
       <Section title="Sharing">
         <p>
           We may share limited data with service providers that help us run the
-          preview, or where required by law. We do not sell personal data to third
-          parties.
+          platform, or where required by law. We do not sell personal data to
+          third parties.
         </p>
       </Section>
 

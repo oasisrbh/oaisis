@@ -21,15 +21,13 @@ import {
   Tag,
   Repeat,
   Calculator,
+  Calendar,
 } from "lucide-react";
 import AssetVisual from "@/components/AssetVisual";
 import StatusBadge from "@/components/StatusBadge";
-import ProgressBar from "@/components/ProgressBar";
-import { useWallet } from "@/components/WalletProvider";
-import ConnectButton from "@/components/ConnectButton";
 import RobinhoodChainBadge from "@/components/RobinhoodChainBadge";
 import CountdownTimer from "@/components/CountdownTimer";
-import { fundedPercentage, formatUsd, activity, launchActivity, RISKS, EXIT_PATHS } from "@/lib/data";
+import { formatUsd, activity, RISKS, EXIT_PATHS, GENESIS_LAUNCH_LABEL } from "@/lib/data";
 
 const EXIT_ICONS = { store: Store, handshake: Handshake, tag: Tag, repeat: Repeat };
 const DOC_ICONS = {
@@ -65,14 +63,10 @@ function ModuleHeading({ eyebrow, title }) {
 export default function AssetDetailClient({ asset }) {
   const [watching, setWatching] = useState(false);
   const [joined, setJoined] = useState(false);
-  const { connected } = useWallet();
-  const funded = fundedPercentage(asset);
-  const allocated = asset.ownershipAvailable <= 0;
-  const launching = !!asset.launchDate;
-  const displayStatus = launching ? "Launching Soon" : asset.status;
-  const poolActivity = launching ? launchActivity : activity;
-  const risks = launching
-    ? [...RISKS, "Launch timing may change. Final pool terms will be shown before contributions open."]
+  const locked = !!asset.isLocked;
+  const statusLabel = asset.launchDate && !locked ? `Launching ${GENESIS_LAUNCH_LABEL}` : undefined;
+  const risks = asset.launchDate
+    ? [...RISKS, "Launch timing may change. Final pool terms will be published before contributions open."]
     : RISKS;
 
   return (
@@ -101,7 +95,6 @@ export default function AssetDetailClient({ asset }) {
               gradient={asset.gradient}
               size="xl"
             />
-            {/* Thumbnail strip (placeholders) */}
             <div className="mt-4 grid grid-cols-4 gap-3">
               <div className="relative overflow-hidden rounded-2xl ring-2 ring-aqua-300">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -153,7 +146,7 @@ export default function AssetDetailClient({ asset }) {
               <span className="pill bg-aqua-50 px-3 py-1 text-xs font-semibold text-aqua-700">
                 {asset.category}
               </span>
-              <StatusBadge status={displayStatus} />
+              <StatusBadge status={locked ? "Locked" : asset.status} label={statusLabel} />
               <RobinhoodChainBadge variant="light" size="sm" label="Robinhood Chain" />
             </div>
             <h1 className="mt-3 text-balance text-[34px] leading-[1.05] h-display sm:text-[40px]">
@@ -164,65 +157,37 @@ export default function AssetDetailClient({ asset }) {
             </p>
 
             <div className="mt-6 rounded-[1.5rem] border border-oasis-line bg-white p-6 shadow-soft">
-              {launching && (
+              {asset.launchDate && (
                 <div className="mb-5">
                   <CountdownTimer targetDate={asset.launchDate} />
                 </div>
               )}
-              <div className="grid grid-cols-2 gap-4">
-                <Stat label="Pool size" value={formatUsd(asset.poolSize)} />
-                <Stat label="Funded" value={formatUsd(asset.fundedAmount)} />
-                <Stat
-                  label="Available ownership"
-                  value={allocated ? "—" : `${asset.ownershipAvailable}%`}
-                />
-                <Stat label="Min entry" value={formatUsd(asset.minEntry)} />
-              </div>
 
-              <div className="mt-5">
-                <ProgressBar value={funded} color={asset.accent} />
-                <div className="mt-2 flex items-center justify-between text-xs">
-                  <span className="font-semibold text-oasis-ink">{funded}% funded</span>
-                  <span className="text-oasis-muted">
-                    {formatUsd(asset.remainingAllocation)} remaining
-                  </span>
+              {locked ? (
+                <div className="flex items-center gap-2 rounded-2xl bg-oasis-bg px-4 py-3.5 text-sm text-oasis-muted">
+                  <Calendar size={16} className="flex-none text-oasis-ink/60" />
+                  Details unlock {GENESIS_LAUNCH_LABEL}.
                 </div>
-              </div>
+              ) : (
+                <div className="grid grid-cols-2 gap-4">
+                  <Stat label="Pool size" value={formatUsd(asset.poolSize)} />
+                  <Stat label="Min entry" value={formatUsd(asset.minEntry)} />
+                </div>
+              )}
 
               <div className="mt-4 flex items-center gap-2 rounded-2xl bg-oasis-bg px-4 py-3 text-xs text-oasis-muted">
                 <Package size={15} className="flex-none" />
-                Custody: {asset.custodyStatus}.
+                Custody and authentication details are published before settlement.
               </div>
 
               <div className="mt-5 space-y-3">
-                {launching ? (
-                  joined ? (
-                    <div className="flex items-center justify-center gap-2 rounded-full bg-aqua-50 py-3.5 text-sm font-semibold text-aqua-700">
-                      <ShieldCheck size={17} /> You're on the waitlist
-                    </div>
-                  ) : (
-                    <motion.button
-                      onClick={() => setJoined(true)}
-                      whileTap={{ scale: 0.98 }}
-                      className="w-full rounded-full bg-aqua-400 py-3.5 text-[15px] font-bold text-oasis-ink transition hover:-translate-y-0.5 hover:shadow-glow"
-                    >
-                      Join Waitlist
-                    </motion.button>
-                  )
-                ) : allocated ? (
-                  <div className="rounded-full bg-oasis-bg py-3.5 text-center text-sm font-semibold text-oasis-muted">
-                    Pool fully allocated
-                  </div>
-                ) : !connected ? (
-                  <div>
-                    <ConnectButton variant="cyan" className="w-full py-3.5 text-[15px]" />
-                    <p className="mt-2 text-center text-xs text-oasis-muted">
-                      Connect your wallet to join this pool
-                    </p>
+                {locked ? (
+                  <div className="flex items-center justify-center gap-2 rounded-full bg-oasis-bg py-3.5 text-sm font-semibold text-oasis-muted">
+                    <Lock size={15} /> Locked
                   </div>
                 ) : joined ? (
                   <div className="flex items-center justify-center gap-2 rounded-full bg-aqua-50 py-3.5 text-sm font-semibold text-aqua-700">
-                    <ShieldCheck size={17} /> You've joined this pool
+                    <ShieldCheck size={17} /> You're on the waitlist
                   </div>
                 ) : (
                   <motion.button
@@ -230,7 +195,7 @@ export default function AssetDetailClient({ asset }) {
                     whileTap={{ scale: 0.98 }}
                     className="w-full rounded-full bg-aqua-400 py-3.5 text-[15px] font-bold text-oasis-ink transition hover:-translate-y-0.5 hover:shadow-glow"
                   >
-                    Join Pool
+                    Join Waitlist
                   </motion.button>
                 )}
 
@@ -247,13 +212,13 @@ export default function AssetDetailClient({ asset }) {
                 </button>
               </div>
 
-              {launching ? (
+              {locked ? (
                 <p className="mt-4 text-center text-xs leading-relaxed text-oasis-muted">
-                  Pool opens in 2.5 weeks. Wallet connection will be enabled before launch.
+                  Genesis Drop launches {GENESIS_LAUNCH_LABEL}.
                 </p>
               ) : (
-                <p className="mt-4 flex items-center justify-center gap-1.5 text-xs text-oasis-muted">
-                  <TrendingUp size={13} /> {asset.estimatedInterest}
+                <p className="mt-4 text-center text-xs leading-relaxed text-oasis-muted">
+                  Genesis pool opens {GENESIS_LAUNCH_LABEL}.
                 </p>
               )}
             </div>
@@ -264,17 +229,21 @@ export default function AssetDetailClient({ asset }) {
       {/* ------------------------------------------------------- pool summary */}
       <Section className="mt-16">
         <ModuleHeading eyebrow="Pool" title="Pool summary" />
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-          {[
-            { label: "Pool size", value: formatUsd(asset.poolSize) },
-            { label: "Funded", value: formatUsd(asset.fundedAmount) },
-            { label: "Available", value: allocated ? "—" : `${asset.ownershipAvailable}%` },
-            { label: "Min entry", value: formatUsd(asset.minEntry) },
-            launching
-              ? { label: "Launch window", value: "2.5 weeks" }
-              : { label: "Target close", value: asset.targetClose },
-            { label: "Chain", value: "Robinhood" },
-          ].map((c) => (
+        <div className={`grid grid-cols-2 gap-3 ${locked ? "sm:grid-cols-4" : "sm:grid-cols-3 lg:grid-cols-4"}`}>
+          {(locked
+            ? [
+                { label: "Status", value: "Locked" },
+                { label: "Details unlock", value: GENESIS_LAUNCH_LABEL },
+                { label: "Category", value: asset.category },
+                { label: "Chain", value: "Robinhood" },
+              ]
+            : [
+                { label: "Pool size", value: formatUsd(asset.poolSize) },
+                { label: "Min entry", value: formatUsd(asset.minEntry) },
+                { label: "Launch date", value: GENESIS_LAUNCH_LABEL },
+                { label: "Chain", value: "Robinhood" },
+              ]
+          ).map((c) => (
             <div key={c.label} className="rounded-2xl border border-oasis-line bg-white p-4 shadow-soft">
               <p className="text-[10px] uppercase tracking-wide text-oasis-muted">{c.label}</p>
               {c.label === "Chain" ? (
@@ -309,7 +278,7 @@ export default function AssetDetailClient({ asset }) {
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {asset.documents.map((d) => {
             const Icon = DOC_ICONS[d.name] || FileText;
-            const locked = d.status === "Locked" || d.status === "Placeholder";
+            const isRestricted = d.status === "Restricted";
             return (
               <div
                 key={d.name}
@@ -319,17 +288,13 @@ export default function AssetDetailClient({ asset }) {
                   <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-oasis-bg text-oasis-ink">
                     <Icon size={18} />
                   </div>
-                  {locked && <Lock size={14} className="text-oasis-muted" />}
+                  {isRestricted && <Lock size={14} className="text-oasis-muted" />}
                 </div>
                 <h3 className="mt-4 text-sm font-bold text-oasis-ink">{d.name}</h3>
                 <p className="mt-0.5 text-xs text-oasis-muted">{d.hint}</p>
                 <span
                   className={`mt-4 inline-flex w-fit items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold ${
-                    d.status === "Available"
-                      ? "bg-aqua-50 text-aqua-700"
-                      : d.status === "In review"
-                      ? "bg-amber-50 text-amber-700"
-                      : "bg-gray-100 text-gray-500"
+                    isRestricted ? "bg-gray-100 text-gray-500" : "bg-amber-50 text-amber-700"
                   }`}
                 >
                   {d.status}
@@ -350,12 +315,10 @@ export default function AssetDetailClient({ asset }) {
             </div>
             <div>
               <p className="text-sm leading-relaxed text-oasis-muted">
-                Asset custody information is shown as a{" "}
-                <span className="font-semibold text-oasis-ink">placeholder</span>{" "}
-                until verified custody details are added. The intended model is
-                insured, professional third-party storage appropriate to the asset
-                category. This asset is not yet custodied, and custody status will
-                be clearly marked before any pool settles.
+                Custody and authentication details will be displayed before pool
+                settlement. The intended model is insured, professional
+                third-party storage appropriate to the asset category, with
+                custody status confirmed before any pool settles.
               </p>
             </div>
           </div>
@@ -364,27 +327,20 @@ export default function AssetDetailClient({ asset }) {
 
       {/* ----------------------------------------------------- pool activity */}
       <Section className="mt-16">
-        <ModuleHeading
-          eyebrow={launching ? "Preview" : "Activity"}
-          title={launching ? "Preview activity" : "Pool activity"}
-        />
+        <ModuleHeading eyebrow="Activity" title="Pool activity" />
         <div className="overflow-hidden rounded-[1.5rem] border border-oasis-line bg-white shadow-soft">
-          <div className="hidden grid-cols-[1.2fr_1.4fr_1fr_1fr_0.8fr] gap-4 border-b border-oasis-line px-6 py-4 text-xs font-semibold uppercase tracking-wide text-oasis-muted sm:grid">
+          <div className="hidden grid-cols-[1.4fr_2fr_1fr] gap-4 border-b border-oasis-line px-6 py-4 text-xs font-semibold uppercase tracking-wide text-oasis-muted sm:grid">
             <span>Wallet</span>
             <span>Action</span>
-            <span>Amount</span>
-            <span>Ownership</span>
             <span className="text-right">Time</span>
           </div>
-          {poolActivity.map((row, i) => (
+          {activity.map((row, i) => (
             <div
               key={i}
-              className="grid grid-cols-2 gap-2 px-6 py-4 text-sm sm:grid-cols-[1.2fr_1.4fr_1fr_1fr_0.8fr] sm:gap-4 sm:border-t sm:border-oasis-line"
+              className="grid grid-cols-2 gap-2 px-6 py-4 text-sm sm:grid-cols-[1.4fr_2fr_1fr] sm:gap-4 sm:border-t sm:border-oasis-line"
             >
               <span className="font-mono text-xs font-semibold text-oasis-ink sm:text-sm">{row.wallet}</span>
               <span className="text-oasis-muted">{row.action}</span>
-              <span className="font-semibold text-oasis-ink">{row.amount}</span>
-              <span className="text-oasis-muted">{row.ownership}</span>
               <span className="text-oasis-muted sm:text-right">{row.time}</span>
             </div>
           ))}
@@ -394,7 +350,15 @@ export default function AssetDetailClient({ asset }) {
       {/* --------------------------------------------------- ownership calc */}
       <Section className="mt-16">
         <ModuleHeading eyebrow="Estimate" title="Ownership calculator" />
-        <OwnershipCalculator asset={asset} launching={launching} />
+        {locked ? (
+          <div className="rounded-[1.5rem] border border-oasis-line bg-white p-7 text-center shadow-soft">
+            <p className="text-sm leading-relaxed text-oasis-muted">
+              Pool economics will be published at Genesis launch on {GENESIS_LAUNCH_LABEL}.
+            </p>
+          </div>
+        ) : (
+          <OwnershipCalculator asset={asset} />
+        )}
       </Section>
 
       {/* ---------------------------------------------------------- exit plan */}
@@ -464,11 +428,10 @@ function ThesisCard({ icon: Icon, title, body }) {
   );
 }
 
-function OwnershipCalculator({ asset, launching = false }) {
+function OwnershipCalculator({ asset }) {
   const [amount, setAmount] = useState(asset.minEntry);
-  const clamped = Math.max(0, Math.min(Number(amount) || 0, asset.remainingAllocation));
+  const clamped = Math.max(0, Math.min(Number(amount) || 0, asset.poolSize));
   const ownership = (clamped / asset.poolSize) * 100;
-  const remainingAfter = Math.max(0, asset.remainingAllocation - clamped);
 
   return (
     <div className="grid gap-5 rounded-[1.5rem] border border-oasis-line bg-white p-7 shadow-soft lg:grid-cols-[1fr_1.2fr]">
@@ -498,19 +461,14 @@ function OwnershipCalculator({ asset, launching = false }) {
           ))}
         </div>
         <p className="mt-3 text-xs text-oasis-muted">
-          Estimates only, based on current pool size. Final ownership is set when the pool settles.
+          Estimate only. Final ownership is confirmed after pool settlement.
         </p>
-        {launching && (
-          <p className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-aqua-50 px-3 py-1 text-[11px] font-semibold text-aqua-700">
-            Preview only until the pool opens.
-          </p>
-        )}
       </div>
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         <CalcOut label="Estimated ownership" value={`${ownership.toFixed(2)}%`} accent />
-        <CalcOut label="Your share of pool" value={`${(ownership).toFixed(2)}%`} />
-        <CalcOut label="Remaining after" value={formatUsd(remainingAfter)} />
+        <CalcOut label="Contribution" value={formatUsd(clamped)} />
+        <CalcOut label="Pool size" value={formatUsd(asset.poolSize)} />
       </div>
     </div>
   );

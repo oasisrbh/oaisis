@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { Search, SlidersHorizontal, Check, ChevronDown, Sparkles } from "lucide-react";
 import AssetCard from "@/components/AssetCard";
 import RobinhoodChainBadge from "@/components/RobinhoodChainBadge";
-import { genesisDrops } from "@/lib/data";
+import { genesisDrops, GENESIS_LAUNCH_LABEL } from "@/lib/data";
 
 const CATEGORY_FILTERS = ["All", "Watches", "Sneakers", "Bags"];
 const STATUS_FILTERS = ["All", "Launching Soon", "Locked"];
@@ -72,8 +72,8 @@ export default function ExploreClient() {
   const lockedCount = genesisDrops.filter((a) => a.isLocked).length;
   const stats = [
     { value: genesisDrops.length, label: "Genesis pools" },
-    { value: launchingCount, label: "Launching soon" },
-    { value: lockedCount, label: "Locked" },
+    { value: launchingCount, label: `Launching ${GENESIS_LAUNCH_LABEL.replace(", 2026", "")}` },
+    { value: lockedCount, label: "Locked drops" },
     { value: "Robinhood", label: "Chain", chain: true },
   ];
 
@@ -103,8 +103,8 @@ export default function ExploreClient() {
             Genesis RWA pools
           </h1>
           <p className="mt-4 text-[15px] leading-relaxed text-oasis-muted">
-            One pool launching soon. Three locked drops. Rare assets prepared for fractional
-            ownership on Robinhood Chain.
+            One Genesis pool opens {GENESIS_LAUNCH_LABEL}. Three locked drops will
+            unlock after launch.
           </p>
         </div>
 

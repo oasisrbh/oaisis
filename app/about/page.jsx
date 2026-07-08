@@ -5,7 +5,7 @@ import { ArrowRight, ShieldCheck, Layers, Gem } from "lucide-react";
 export const metadata = {
   title: "About — Oasis",
   description:
-    "Oasis brings fractional ownership of real-world luxury assets onchain, built for Robinhood Chain.",
+    "Oasis brings fractional ownership of real-world luxury assets onchain, built on Robinhood Chain.",
 };
 
 const PILLARS = [
@@ -38,9 +38,9 @@ export default function AboutPage() {
             Own a slice of rare luxury.
           </h1>
           <p className="mt-5 text-lg leading-relaxed text-oasis-muted">
-            Oasis is a premium platform for fractional ownership of real-world
-            assets — luxury watches, rare sneakers, and collectible RWAs pooled
-            onchain and built for Robinhood Chain.
+            Oasis is a platform for fractional ownership of real-world assets —
+            luxury watches, rare sneakers, bags, and collectible RWAs pooled
+            onchain and built on Robinhood Chain.
           </p>
           <div className="mt-8 flex justify-center gap-3">
             <Link
@@ -84,11 +84,11 @@ export default function AboutPage() {
         <div className="rounded-4xl border border-oasis-line bg-white p-8 shadow-soft">
           <h2 className="text-xl font-bold text-oasis-ink">A note on risk</h2>
           <p className="mt-3 max-w-3xl text-sm leading-relaxed text-oasis-muted">
-            Fractional ownership of real-world assets involves risk. Asset values
-            may fluctuate and returns are not guaranteed. Oasis does not guarantee
-            resale value, profit, or exit timing. This site is an early product
-            preview using placeholder data — nothing here is an offer, solicitation,
-            or investment advice.
+            Fractional ownership of real-world assets involves risk. Asset
+            values may fluctuate and returns are not guaranteed. Oasis does not
+            guarantee resale value, profit, or exit timing. Nothing on Oasis is
+            an offer, solicitation, or investment advice — review final pool
+            terms before participating.
           </p>
         </div>
       </section>

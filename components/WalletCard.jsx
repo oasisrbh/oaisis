@@ -1,18 +1,17 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Check, ArrowRight, Lock } from "lucide-react";
+import { Check, ArrowRight, Layers, Heart } from "lucide-react";
 import { useWallet } from "@/components/WalletProvider";
 import ConnectButton from "@/components/ConnectButton";
 import RobinhoodChainBadge from "@/components/RobinhoodChainBadge";
 import BrandLogo from "@/components/BrandLogo";
-import { genesisDrops } from "@/lib/data";
+import CountdownTimer from "@/components/CountdownTimer";
+import { genesisDrops, GENESIS_LAUNCH_DATE } from "@/lib/data";
 
 // Navy gradient wallet card beside the hero — a premium finance surface.
-// Launch-safe: no holdings or value are shown before the Genesis pool opens.
 export default function WalletCard() {
   const { connected } = useWallet();
-  const launchingCount = genesisDrops.filter((a) => a.status === "Launching Soon").length;
   const lockedCount = genesisDrops.filter((a) => a.isLocked).length;
 
   return (
@@ -51,29 +50,18 @@ export default function WalletCard() {
           <>
             <h3 className="mt-6 text-xl font-bold leading-snug">Your Oasis portfolio</h3>
             <p className="mt-2 text-sm leading-relaxed text-white/65">
-              Connect a wallet to track your watchlist and Genesis pool status.
+              Connect your wallet to view pool access, watchlist, and Genesis
+              launch status.
             </p>
 
-            {/* Blurred, locked mini preview */}
-            <div className="relative mt-5">
-              <div className="space-y-2.5 select-none blur-[5px]" aria-hidden="true">
-                {genesisDrops.map((a) => (
-                  <div
-                    key={a.id}
-                    className="flex items-center justify-between rounded-xl bg-white/5 px-3 py-2.5"
-                  >
-                    <div className="flex items-center gap-2">
-                      <span className="h-2.5 w-2.5 rounded-full bg-aqua-400" />
-                      <span className="text-sm text-white/80">{a.name}</span>
-                    </div>
-                    <span className="text-sm font-semibold">—</span>
-                  </div>
-                ))}
+            <div className="mt-5 grid grid-cols-2 gap-3">
+              <div className="rounded-xl border border-white/10 bg-white/5 p-3">
+                <p className="text-xl font-bold">{genesisDrops.length}</p>
+                <p className="text-xs text-white/50">Genesis pools</p>
               </div>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="pill gap-1.5 bg-white/10 px-3 py-1.5 text-xs font-semibold text-white/80 backdrop-blur">
-                  <Lock size={12} /> Locked
-                </span>
+              <div className="rounded-xl border border-white/10 bg-white/5 p-3">
+                <p className="text-xl font-bold">{lockedCount}</p>
+                <p className="text-xs text-white/50">Locked drops</p>
               </div>
             </div>
 
@@ -83,26 +71,35 @@ export default function WalletCard() {
           </>
         ) : (
           <>
-            <p className="mt-6 text-sm text-white/55">Wallet connected</p>
-            <p className="mt-1 text-2xl font-bold">Genesis preview</p>
-            <p className="mt-3 text-sm leading-relaxed text-white/60">
-              No holdings yet. Your ownership appears here after the Genesis pool launches.
+            <p className="mt-6 flex items-center gap-1.5 text-sm text-white/55">
+              <span className="flex h-4 w-4 items-center justify-center rounded-full bg-aqua-400/20">
+                <Check size={10} className="text-aqua-200" />
+              </span>
+              Wallet connected
             </p>
 
-            <div className="mt-5 grid grid-cols-2 gap-3">
+            <div className="mt-4 grid grid-cols-2 gap-3">
               <div className="rounded-xl border border-white/10 bg-white/5 p-3">
-                <p className="text-xl font-bold">{launchingCount}</p>
-                <p className="text-xs text-white/50">Launching soon</p>
+                <p className="flex items-center gap-1.5 text-xs text-white/50">
+                  <Heart size={11} /> Watchlist
+                </p>
+                <p className="mt-1 text-xl font-bold">{genesisDrops.length}</p>
               </div>
               <div className="rounded-xl border border-white/10 bg-white/5 p-3">
-                <p className="text-xl font-bold">{lockedCount}</p>
-                <p className="text-xs text-white/50">Locked drops</p>
+                <p className="flex items-center gap-1.5 text-xs text-white/50">
+                  <Layers size={11} /> Genesis pools
+                </p>
+                <p className="mt-1 text-xl font-bold">{genesisDrops.length}</p>
               </div>
+            </div>
+
+            <div className="mt-4">
+              <CountdownTimer targetDate={GENESIS_LAUNCH_DATE} label="Genesis launches in" />
             </div>
 
             <a
               href="/portfolio"
-              className="mt-5 flex items-center justify-center gap-2 rounded-full bg-aqua-400 py-3 text-[15px] font-bold text-oasis-ink transition hover:brightness-105"
+              className="mt-4 flex items-center justify-center gap-2 rounded-full bg-aqua-400 py-3 text-[15px] font-bold text-oasis-ink transition hover:brightness-105"
             >
               View portfolio <ArrowRight size={16} />
             </a>

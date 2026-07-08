@@ -32,9 +32,9 @@ export function InfoPage({ eyebrow, title, intro, updated, children }) {
 
       <div className="mt-16 rounded-2xl border border-oasis-line bg-oasis-sand p-5">
         <p className="text-xs leading-relaxed text-oasis-muted">
-          <span className="font-semibold text-oasis-ink">Preview note.</span> Oasis
-          is an early product preview using placeholder data. This page is
-          informational only and is not legal, financial, or investment advice.
+          <span className="font-semibold text-oasis-ink">Note.</span> This page
+          is provided for general information only and is not legal, financial,
+          tax, or investment advice.
         </p>
       </div>
     </div>

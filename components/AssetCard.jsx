@@ -3,12 +3,11 @@
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { ArrowUpRight, Lock } from "lucide-react";
+import { ArrowUpRight, Lock, Calendar } from "lucide-react";
 import AssetVisual from "@/components/AssetVisual";
 import StatusBadge from "@/components/StatusBadge";
-import ProgressBar from "@/components/ProgressBar";
 import RobinhoodChainBadge from "@/components/RobinhoodChainBadge";
-import { fundedPercentage, formatUsd } from "@/lib/data";
+import { formatUsd, GENESIS_LAUNCH_LABEL } from "@/lib/data";
 
 // Chain badge that fades in on card hover (kept out of the resting layout).
 function HoverChainBadge() {
@@ -27,16 +26,13 @@ export default function AssetCard({ asset, index = 0 }) {
       viewport={{ once: true, margin: "-60px" }}
       transition={{ duration: 0.55, delay: Math.min(index * 0.06, 0.3), ease: [0.22, 1, 0.36, 1] }}
     >
-      {asset.isLocked ? <LockedCard asset={asset} /> : <LiveCard asset={asset} />}
+      {asset.isLocked ? <LockedCard asset={asset} /> : <OpenCard asset={asset} />}
     </motion.div>
   );
 }
 
-// --------------------------------------------------------------- live card
-function LiveCard({ asset }) {
-  const funded = fundedPercentage(asset);
-  const allocated = asset.ownershipAvailable <= 0;
-
+// ---------------------------------------------------------------- open card
+function OpenCard({ asset }) {
   return (
     <Link
       href={`/drops/${asset.id}`}
@@ -79,25 +75,17 @@ function LiveCard({ asset }) {
             <p className="mt-0.5 text-sm font-bold text-oasis-ink">{formatUsd(asset.poolSize)}</p>
           </div>
           <div>
-            <p className="text-[10px] uppercase tracking-wide text-oasis-muted">Funded</p>
-            <p className="mt-0.5 text-sm font-bold text-oasis-ink">{formatUsd(asset.fundedAmount)}</p>
+            <p className="text-[10px] uppercase tracking-wide text-oasis-muted">Min entry</p>
+            <p className="mt-0.5 text-sm font-bold text-oasis-ink">{formatUsd(asset.minEntry)}</p>
           </div>
         </div>
 
-        <div className="mt-3">
-          <ProgressBar value={funded} color={asset.accent} />
-          <div className="mt-2 flex items-center justify-between text-xs">
-            <span className="font-semibold text-oasis-ink">{funded}% funded</span>
-            <span className="text-oasis-muted">
-              {allocated ? "Fully allocated" : `${asset.ownershipAvailable}% available`}
-            </span>
-          </div>
+        <div className="mt-3 flex items-center gap-1.5 rounded-xl bg-aqua-50 px-3 py-2 text-xs font-semibold text-aqua-700">
+          <Calendar size={13} /> Launching {GENESIS_LAUNCH_LABEL}
         </div>
 
         <div className="mt-auto flex items-center justify-between border-t border-oasis-line pt-4">
-          <span className="text-xs text-oasis-muted">
-            Min <span className="font-semibold text-oasis-ink">{formatUsd(asset.minEntry)}</span>
-          </span>
+          <span className="text-xs text-oasis-muted">Genesis pool</span>
           <span className="pill bg-oasis-sand px-3.5 py-1.5 text-xs font-semibold text-oasis-ink transition-colors group-hover:bg-aqua-400 group-hover:text-oasis-ink">
             View Pool
           </span>
@@ -107,7 +95,7 @@ function LiveCard({ asset }) {
   );
 }
 
-// ------------------------------------------------------------- locked card
+// -------------------------------------------------------------- locked card
 function LockedCard({ asset }) {
   return (
     <div className="card-hover group relative flex h-full cursor-default flex-col rounded-[1.75rem] border border-oasis-line bg-white p-3 shadow-soft transition-shadow hover:border-aqua-400/70 hover:shadow-glow">
@@ -121,7 +109,7 @@ function LockedCard({ asset }) {
           gradient={asset.gradient}
           size="lg"
         />
-        {/* dark translucent, blurred overlay hides the product */}
+        {/* dark translucent overlay conceals the product until launch */}
         <div className="absolute inset-0 flex flex-col items-center justify-center rounded-3xl bg-oasis-ink/72 text-center backdrop-blur-md">
           <Image
             src="/brand/oasis-icon.png"
@@ -136,7 +124,7 @@ function LockedCard({ asset }) {
           </span>
           <p className="mt-3 text-sm font-bold text-white">Locked Drop</p>
           <p className="mt-0.5 text-xs text-white/60">
-            <span className="group-hover:hidden">Opens after launch</span>
+            <span className="group-hover:hidden">Details unlock at Genesis launch</span>
             <span className="hidden font-semibold text-aqua-300 group-hover:inline">Coming soon</span>
           </p>
         </div>
@@ -154,7 +142,7 @@ function LockedCard({ asset }) {
         <HoverChainBadge />
       </div>
 
-      {/* Body — name teased, numbers hidden */}
+      {/* Body — name teased, no pool numbers until confirmed */}
       <div className="flex flex-1 flex-col px-2.5 pb-1 pt-4">
         <div className="flex items-start justify-between gap-2">
           <h3 className="text-[17px] font-bold leading-tight text-oasis-ink">{asset.name}</h3>
@@ -163,36 +151,11 @@ function LockedCard({ asset }) {
           </span>
         </div>
         <p className="mt-1.5 text-[13.5px] leading-relaxed text-oasis-muted">
-          Full details revealed at launch.
+          {asset.description}
         </p>
 
-        {/* Dimmed / blurred sensitive numbers */}
-        <div className="mt-4 grid grid-cols-2 gap-2 rounded-2xl bg-oasis-bg/70 p-3">
-          <div>
-            <p className="text-[10px] uppercase tracking-wide text-oasis-muted">Pool size</p>
-            <p className="mt-0.5 select-none text-sm font-bold text-oasis-ink/80 blur-[6px]">
-              {formatUsd(asset.poolSize)}
-            </p>
-          </div>
-          <div>
-            <p className="text-[10px] uppercase tracking-wide text-oasis-muted">Funded</p>
-            <p className="mt-0.5 select-none text-sm font-bold text-oasis-ink/80 blur-[6px]">
-              {formatUsd(asset.fundedAmount)}
-            </p>
-          </div>
-        </div>
-
-        {/* Locked progress state */}
-        <div className="mt-3">
-          <div className="flex h-2 w-full items-center overflow-hidden rounded-full bg-oasis-line/80">
-            <div className="h-full w-1/4 rounded-full bg-[repeating-linear-gradient(45deg,#c8ff0055_0,#c8ff0055_6px,transparent_6px,transparent_12px)]" />
-          </div>
-          <div className="mt-2 flex items-center justify-between text-xs">
-            <span className="inline-flex items-center gap-1 font-semibold text-oasis-muted">
-              <Lock size={11} /> Funding locked
-            </span>
-            <span className="select-none text-oasis-muted blur-[4px]">••%</span>
-          </div>
+        <div className="mt-4 flex items-center gap-1.5 rounded-xl bg-oasis-bg/70 px-3 py-2.5 text-xs font-semibold text-oasis-muted">
+          <Calendar size={13} /> Details unlock {GENESIS_LAUNCH_LABEL}
         </div>
 
         {/* Disabled CTA */}
