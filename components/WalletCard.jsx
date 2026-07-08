@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { Check, ArrowRight, Layers, Heart } from "lucide-react";
-import { useWallet } from "@/components/WalletProvider";
+import { useOasisWallet } from "@/hooks/useOasisWallet";
 import ConnectButton from "@/components/ConnectButton";
 import RobinhoodChainBadge from "@/components/RobinhoodChainBadge";
 import BrandLogo from "@/components/BrandLogo";
@@ -11,7 +11,7 @@ import { genesisDrops, GENESIS_LAUNCH_DATE } from "@/lib/data";
 
 // Navy gradient wallet card beside the hero — a premium finance surface.
 export default function WalletCard() {
-  const { connected } = useWallet();
+  const { isConnected } = useOasisWallet();
   const lockedCount = genesisDrops.filter((a) => a.isLocked).length;
 
   return (
@@ -46,7 +46,7 @@ export default function WalletCard() {
           <RobinhoodChainBadge variant="dark" size="sm" label="Robinhood Chain" />
         </div>
 
-        {!connected ? (
+        {!isConnected ? (
           <>
             <h3 className="mt-6 text-xl font-bold leading-snug">Your Oasis portfolio</h3>
             <p className="mt-2 text-sm leading-relaxed text-white/65">

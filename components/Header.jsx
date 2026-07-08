@@ -3,13 +3,13 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X, User, LogOut } from "lucide-react";
+import { Menu, X, User, LogOut, AlertTriangle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import BrandLogo from "@/components/BrandLogo";
 import ConnectButton from "@/components/ConnectButton";
-import WalletMenu from "@/components/WalletMenu";
+import WalletButton from "@/components/WalletButton";
 import RobinhoodChainBadge from "@/components/RobinhoodChainBadge";
-import { useWallet } from "@/components/WalletProvider";
+import { useOasisWallet } from "@/hooks/useOasisWallet";
 
 const NAV = [
   { label: "Home", href: "/" },
@@ -45,7 +45,7 @@ function XButton({ className = "" }) {
 
 export default function Header() {
   const pathname = usePathname();
-  const { connected, address, disconnect } = useWallet();
+  const { isConnected, isCorrectChain, shortAddress, disconnect } = useOasisWallet();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -99,7 +99,7 @@ export default function Header() {
         <div className="flex items-center gap-2">
           <XButton className="hidden md:flex" />
           <div className="hidden md:block">
-            <WalletMenu />
+            <WalletButton />
           </div>
           <button
             className="flex h-10 w-10 items-center justify-center rounded-full text-oasis-ink md:hidden"
@@ -135,15 +135,21 @@ export default function Header() {
                   {item.label}
                 </Link>
               ))}
-              {connected ? (
+              {isConnected ? (
                 <div className="px-1 pt-2">
                   <div className="rounded-2xl border border-oasis-line bg-white p-2">
                     <div className="flex items-center justify-between px-2 py-1.5">
                       <div>
                         <p className="text-[10px] uppercase tracking-wide text-oasis-muted">Wallet</p>
-                        <p className="font-mono text-sm font-semibold text-oasis-ink">{address}</p>
+                        <p className="font-mono text-sm font-semibold text-oasis-ink">{shortAddress}</p>
                       </div>
-                      <RobinhoodChainBadge variant="light" size="sm" showText={false} />
+                      {isCorrectChain ? (
+                        <RobinhoodChainBadge variant="light" size="sm" showText={false} />
+                      ) : (
+                        <span className="pill gap-1 bg-amber-50 px-2 py-0.5 text-[10px] font-semibold text-amber-700">
+                          <AlertTriangle size={11} /> Wrong network
+                        </span>
+                      )}
                     </div>
                     <Link
                       href="/portfolio"

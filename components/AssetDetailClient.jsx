@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import {
@@ -22,11 +22,16 @@ import {
   Repeat,
   Calculator,
   Calendar,
+  Loader2,
+  Check,
 } from "lucide-react";
 import AssetVisual from "@/components/AssetVisual";
 import StatusBadge from "@/components/StatusBadge";
 import RobinhoodChainBadge from "@/components/RobinhoodChainBadge";
 import CountdownTimer from "@/components/CountdownTimer";
+import ConnectButton from "@/components/ConnectButton";
+import { useOasisWallet } from "@/hooks/useOasisWallet";
+import { hasJoinedWaitlist, joinWaitlist } from "@/lib/waitlist";
 import { formatUsd, activity, RISKS, EXIT_PATHS, GENESIS_LAUNCH_LABEL } from "@/lib/data";
 
 const EXIT_ICONS = { store: Store, handshake: Handshake, tag: Tag, repeat: Repeat };
@@ -63,11 +68,21 @@ function ModuleHeading({ eyebrow, title }) {
 export default function AssetDetailClient({ asset }) {
   const [watching, setWatching] = useState(false);
   const [joined, setJoined] = useState(false);
+  const wallet = useOasisWallet();
   const locked = !!asset.isLocked;
   const statusLabel = asset.launchDate && !locked ? `Launching ${GENESIS_LAUNCH_LABEL}` : undefined;
   const risks = asset.launchDate
     ? [...RISKS, "Launch timing may change. Final pool terms will be published before contributions open."]
     : RISKS;
+
+  useEffect(() => {
+    setJoined(hasJoinedWaitlist(wallet.address, asset.id));
+  }, [wallet.address, asset.id]);
+
+  const handleJoinWaitlist = () => {
+    joinWaitlist(wallet.address, asset.id);
+    setJoined(true);
+  };
 
   return (
     <div className="container-oasis pt-8">
@@ -185,18 +200,35 @@ export default function AssetDetailClient({ asset }) {
                   <div className="flex items-center justify-center gap-2 rounded-full bg-oasis-bg py-3.5 text-sm font-semibold text-oasis-muted">
                     <Lock size={15} /> Locked
                   </div>
+                ) : !wallet.isConnected ? (
+                  <ConnectButton variant="cyan" className="w-full py-3.5 text-[15px]" />
+                ) : !wallet.isCorrectChain ? (
+                  <motion.button
+                    onClick={wallet.switchToRobinhoodChain}
+                    disabled={wallet.isSwitching}
+                    whileTap={{ scale: 0.98 }}
+                    className="flex w-full items-center justify-center gap-2 rounded-full bg-oasis-ink py-3.5 text-[15px] font-bold text-aqua-400 transition hover:brightness-110 disabled:opacity-70"
+                  >
+                    {wallet.isSwitching && <Loader2 size={16} className="animate-spin" />}
+                    Switch to Robinhood Chain
+                  </motion.button>
                 ) : joined ? (
                   <div className="flex items-center justify-center gap-2 rounded-full bg-aqua-50 py-3.5 text-sm font-semibold text-aqua-700">
-                    <ShieldCheck size={17} /> You're on the waitlist
+                    <Check size={17} /> Joined Waitlist
                   </div>
                 ) : (
                   <motion.button
-                    onClick={() => setJoined(true)}
+                    onClick={handleJoinWaitlist}
                     whileTap={{ scale: 0.98 }}
                     className="w-full rounded-full bg-aqua-400 py-3.5 text-[15px] font-bold text-oasis-ink transition hover:-translate-y-0.5 hover:shadow-glow"
                   >
                     Join Waitlist
                   </motion.button>
+                )}
+                {wallet.error && (
+                  <p className="rounded-xl bg-amber-50 px-3 py-2 text-center text-xs text-amber-700">
+                    {wallet.error}
+                  </p>
                 )}
 
                 <button

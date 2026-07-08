@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import {
@@ -14,10 +14,14 @@ import {
   Coins,
   Archive,
   Calendar,
+  AlertTriangle,
+  Loader2,
+  Check,
 } from "lucide-react";
 import StatusBadge from "@/components/StatusBadge";
 import CountdownTimer from "@/components/CountdownTimer";
-import { useWallet } from "@/components/WalletProvider";
+import { useOasisWallet } from "@/hooks/useOasisWallet";
+import { hasJoinedWaitlist, joinWaitlist } from "@/lib/waitlist";
 import ConnectButton from "@/components/ConnectButton";
 import BrandLogo from "@/components/BrandLogo";
 import {
@@ -40,8 +44,8 @@ function LockedBadge() {
 }
 
 export default function PortfolioClient() {
-  const { connected, address } = useWallet();
-  if (!connected) return <NotConnected />;
+  const wallet = useOasisWallet();
+  if (!wallet.isConnected) return <NotConnected />;
 
   const launchingCount = genesisDrops.filter((a) => a.status === "Launching Soon").length;
   const lockedCount = genesisDrops.filter((a) => a.isLocked).length;
@@ -80,13 +84,30 @@ export default function PortfolioClient() {
         </div>
         <div className="flex flex-col items-start gap-3 lg:items-end">
           <span className="pill w-fit gap-2 border border-oasis-line bg-white px-4 py-2 text-sm font-mono font-semibold text-oasis-ink shadow-soft">
-            <span className="h-2 w-2 rounded-full bg-aqua-400" /> {address}
+            <span className="h-2 w-2 rounded-full bg-aqua-400" /> {wallet.shortAddress}
           </span>
           <div className="w-full sm:w-[300px]">
             <CountdownTimer targetDate={GENESIS_LAUNCH_DATE} label="Genesis launches in" />
           </div>
         </div>
       </motion.div>
+
+      {!wallet.isCorrectChain && (
+        <div className="mt-6 flex flex-col gap-2.5 rounded-2xl border border-amber-200 bg-amber-50 p-4 sm:flex-row sm:items-center sm:justify-between">
+          <p className="flex items-center gap-2 text-sm font-semibold text-amber-800">
+            <AlertTriangle size={16} className="flex-none" />
+            Switch to {wallet.targetChain.name} to join a Genesis waitlist.
+          </p>
+          <button
+            onClick={wallet.switchToRobinhoodChain}
+            disabled={wallet.isSwitching}
+            className="flex items-center justify-center gap-2 rounded-full bg-oasis-ink px-4 py-2 text-xs font-bold text-aqua-400 transition hover:brightness-110 disabled:opacity-70"
+          >
+            {wallet.isSwitching && <Loader2 size={13} className="animate-spin" />}
+            Switch Network
+          </button>
+        </div>
+      )}
 
       {/* Top stat cards */}
       <div className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
@@ -97,8 +118,8 @@ export default function PortfolioClient() {
 
       {/* Main 3-column grid */}
       <div className="mt-6 grid gap-5 lg:grid-cols-[320px_1fr_340px]">
-        <ContributionEstimate />
-        <GenesisPoolStatus />
+        <ContributionEstimate wallet={wallet} />
+        <GenesisPoolStatus wallet={wallet} />
         <OwnershipAllocation />
       </div>
 
@@ -208,13 +229,22 @@ function StatCard({ icon: Icon, label, value, delay }) {
 }
 
 // ------------------------------------------------------ contribution estimate
-function ContributionEstimate() {
+function ContributionEstimate({ wallet }) {
   const first = OPEN_DROPS[0];
   const [id, setId] = useState(first.id);
   const [amount, setAmount] = useState(500);
   const [joined, setJoined] = useState(false);
   const asset = OPEN_DROPS.find((a) => a.id === id) || first;
   const ownership = ((Number(amount) || 0) / asset.poolSize) * 100;
+
+  useEffect(() => {
+    setJoined(hasJoinedWaitlist(wallet.address, id));
+  }, [wallet.address, id]);
+
+  const handleJoin = () => {
+    joinWaitlist(wallet.address, id);
+    setJoined(true);
+  };
 
   return (
     <motion.div
@@ -265,13 +295,22 @@ function ContributionEstimate() {
         </p>
       </div>
 
-      {joined ? (
+      {!wallet.isCorrectChain ? (
+        <button
+          onClick={wallet.switchToRobinhoodChain}
+          disabled={wallet.isSwitching}
+          className="mt-4 flex w-full items-center justify-center gap-2 rounded-full bg-oasis-ink py-3 text-sm font-bold text-aqua-400 transition hover:brightness-110 disabled:opacity-70"
+        >
+          {wallet.isSwitching && <Loader2 size={15} className="animate-spin" />}
+          Switch to Robinhood Chain
+        </button>
+      ) : joined ? (
         <div className="mt-4 flex items-center justify-center gap-2 rounded-full bg-aqua-50 py-3 text-sm font-semibold text-aqua-700">
-          On the waitlist
+          <Check size={15} /> Joined Waitlist
         </div>
       ) : (
         <button
-          onClick={() => setJoined(true)}
+          onClick={handleJoin}
           className="mt-4 flex w-full items-center justify-center gap-2 rounded-full bg-aqua-400 py-3 text-sm font-bold text-oasis-ink transition hover:brightness-105"
         >
           Join Waitlist <ArrowRight size={15} />
@@ -286,7 +325,7 @@ function ContributionEstimate() {
 }
 
 // ------------------------------------------------------- genesis pool status
-function GenesisPoolStatus() {
+function GenesisPoolStatus({ wallet }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -296,20 +335,24 @@ function GenesisPoolStatus() {
     >
       <h3 className="text-lg font-bold text-oasis-ink">Genesis pool status</h3>
       <div className="mt-4 space-y-3">
-        {genesisDrops.map((a) =>
-          a.isLocked ? (
-            <div key={a.id} className="rounded-2xl border border-oasis-line p-4">
-              <div className="flex items-center justify-between">
-                <span className="flex items-center gap-2 font-semibold text-oasis-ink">
-                  <Lock size={14} className="text-oasis-muted" /> {a.name}
-                </span>
-                <LockedBadge />
+        {genesisDrops.map((a) => {
+          if (a.isLocked) {
+            return (
+              <div key={a.id} className="rounded-2xl border border-oasis-line p-4">
+                <div className="flex items-center justify-between">
+                  <span className="flex items-center gap-2 font-semibold text-oasis-ink">
+                    <Lock size={14} className="text-oasis-muted" /> {a.name}
+                  </span>
+                  <LockedBadge />
+                </div>
+                <p className="mt-2.5 text-xs text-oasis-muted">
+                  Details unlock {GENESIS_LAUNCH_LABEL}.
+                </p>
               </div>
-              <p className="mt-2.5 text-xs text-oasis-muted">
-                Details unlock {GENESIS_LAUNCH_LABEL}.
-              </p>
-            </div>
-          ) : (
+            );
+          }
+          const joined = hasJoinedWaitlist(wallet.address, a.id);
+          return (
             <Link
               key={a.id}
               href={`/drops/${a.id}`}
@@ -320,7 +363,14 @@ function GenesisPoolStatus() {
                   {a.name}
                   <ArrowUpRight size={14} className="text-oasis-muted opacity-0 transition group-hover:opacity-100" />
                 </span>
-                <StatusBadge status="Launching Soon" />
+                <div className="flex items-center gap-1.5">
+                  {joined && (
+                    <span className="pill gap-1 bg-aqua-50 px-2 py-0.5 text-[10px] font-semibold text-aqua-700">
+                      <Check size={10} /> Joined
+                    </span>
+                  )}
+                  <StatusBadge status="Launching Soon" />
+                </div>
               </div>
               <div className="mt-3 flex flex-wrap items-center gap-x-6 gap-y-2">
                 <div>
@@ -336,8 +386,8 @@ function GenesisPoolStatus() {
                 </span>
               </div>
             </Link>
-          )
-        )}
+          );
+        })}
       </div>
     </motion.div>
   );
@@ -428,7 +478,7 @@ function NotConnected() {
             Track your watchlist and Genesis pool status. Ownership appears here
             after you participate in an open pool.
           </p>
-          <div className="mt-7 flex justify-center">
+          <div className="relative mt-7 flex justify-center">
             <ConnectButton variant="cyan" className="px-6 py-3 text-[15px]" />
           </div>
           <Link

@@ -1,5 +1,8 @@
+import { headers } from "next/headers";
+import { cookieToInitialState } from "wagmi";
 import "./globals.css";
-import { WalletProvider } from "@/components/WalletProvider";
+import { wagmiConfig } from "@/lib/wagmi";
+import Web3Provider from "@/components/Web3Provider";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
@@ -9,7 +12,11 @@ export const metadata = {
     "Fractional pools for luxury watches, rare sneakers, and collectible RWAs. Built for onchain ownership on Robinhood Chain.",
 };
 
-export default function RootLayout({ children }) {
+export default async function RootLayout({ children }) {
+  // Reading the wagmi cookie server-side lets the wallet's connected state
+  // hydrate correctly on first paint instead of flashing "disconnected".
+  const initialState = cookieToInitialState(wagmiConfig, headers().get("cookie"));
+
   return (
     <html lang="en">
       <head>
@@ -21,11 +28,11 @@ export default function RootLayout({ children }) {
         />
       </head>
       <body>
-        <WalletProvider>
+        <Web3Provider initialState={initialState}>
           <Header />
           <main>{children}</main>
           <Footer />
-        </WalletProvider>
+        </Web3Provider>
       </body>
     </html>
   );

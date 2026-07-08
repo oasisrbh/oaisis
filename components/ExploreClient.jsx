@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { Search, SlidersHorizontal, Check, ChevronDown, Sparkles } from "lucide-react";
 import AssetCard from "@/components/AssetCard";
 import RobinhoodChainBadge from "@/components/RobinhoodChainBadge";
+import ChainGuard from "@/components/ChainGuard";
 import { genesisDrops, GENESIS_LAUNCH_LABEL } from "@/lib/data";
 
 const CATEGORY_FILTERS = ["All", "Watches", "Sneakers", "Bags"];
@@ -124,6 +125,8 @@ export default function ExploreClient() {
           ))}
         </div>
       </motion.div>
+
+      <ChainGuard className="mt-6" />
 
       {/* Search + sort */}
       <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
