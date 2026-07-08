@@ -6,10 +6,17 @@ import { Wallet, Loader2 } from "lucide-react";
 import { useOasisWallet } from "@/hooks/useOasisWallet";
 
 const CONNECTOR_LABEL = {
-  injected: "Browser Wallet",
-  coinbaseWallet: "Coinbase Wallet",
+  injected: "MetaMask",
   walletConnect: "WalletConnect",
 };
+
+// Prefer the wallet's own EIP-6963-announced name (so e.g. Rabby still shows
+// as "Rabby") and only fall back to the generic label for the plain
+// window.ethereum injected connector with no announced identity.
+function connectorLabel(c) {
+  if (c.name && c.name !== "Injected") return c.name;
+  return CONNECTOR_LABEL[c.type] || c.name;
+}
 
 // Standalone "Connect Wallet" trigger for CTA surfaces (hero card, portfolio
 // empty state) — opens a small connector picker. For the header's full
@@ -89,7 +96,7 @@ export default function ConnectButton({ variant = "solid", className = "" }) {
                 className="group flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm font-medium text-white/85 transition hover:bg-white/5 hover:text-aqua-400"
               >
                 <Wallet size={16} className="text-white/45 transition group-hover:text-aqua-400" />
-                {CONNECTOR_LABEL[c.type] || c.name}
+                {connectorLabel(c)}
               </button>
             ))}
             {wallet.error && (
