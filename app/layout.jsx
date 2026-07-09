@@ -3,6 +3,7 @@ import { cookieToInitialState } from "wagmi";
 import "./globals.css";
 import { wagmiConfig } from "@/lib/wagmi";
 import Web3Provider from "@/components/Web3Provider";
+import ContractAddressBar from "@/components/ContractAddressBar";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
@@ -29,6 +30,7 @@ export default async function RootLayout({ children }) {
       </head>
       <body>
         <Web3Provider initialState={initialState}>
+          <ContractAddressBar />
           <Header />
           <main>{children}</main>
           <Footer />
