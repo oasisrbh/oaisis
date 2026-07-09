@@ -69,6 +69,8 @@ function ModuleHeading({ eyebrow, title }) {
 export default function AssetDetailClient({ asset }) {
   const [watching, setWatching] = useState(false);
   const [joined, setJoined] = useState(false);
+  const gallery = asset.images?.length ? asset.images : [asset.image];
+  const [activeImage, setActiveImage] = useState(gallery[0]);
   const wallet = useOasisWallet();
   const locked = !!asset.isLocked;
   const live = asset.status === "Live" && !locked;
@@ -106,26 +108,46 @@ export default function AssetDetailClient({ asset }) {
           <div className="rounded-[2rem] border border-oasis-line bg-white p-4 shadow-soft">
             <AssetVisual
               icon={asset.icon}
-              image={asset.image}
+              image={activeImage}
               brand={asset.brand}
               accent={asset.accent}
               gradient={asset.gradient}
               size="xl"
             />
-            <div className="mt-4 grid grid-cols-4 gap-3">
-              <div className="relative overflow-hidden rounded-2xl ring-2 ring-aqua-300">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={asset.image} alt="" className="h-16 w-full object-cover" />
+            {gallery.length > 1 ? (
+              <div className={`mt-4 grid gap-3 ${gallery.length >= 5 ? "grid-cols-5" : "grid-cols-4"}`}>
+                {gallery.map((src) => (
+                  <button
+                    key={src}
+                    onClick={() => setActiveImage(src)}
+                    aria-label="View photo"
+                    className={`relative overflow-hidden rounded-2xl transition ${
+                      activeImage === src
+                        ? "ring-2 ring-aqua-300"
+                        : "opacity-75 hover:opacity-100"
+                    }`}
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={src} alt="" className="h-16 w-full object-cover" />
+                  </button>
+                ))}
               </div>
-              {[0, 1, 2].map((n) => (
-                <div
-                  key={n}
-                  className={`flex h-16 items-center justify-center rounded-2xl bg-gradient-to-br ${asset.gradient} text-[10px] font-medium text-oasis-ink/40`}
-                >
-                  View {n + 2}
+            ) : (
+              <div className="mt-4 grid grid-cols-4 gap-3">
+                <div className="relative overflow-hidden rounded-2xl ring-2 ring-aqua-300">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={asset.image} alt="" className="h-16 w-full object-cover" />
                 </div>
-              ))}
-            </div>
+                {[0, 1, 2].map((n) => (
+                  <div
+                    key={n}
+                    className={`flex h-16 items-center justify-center rounded-2xl bg-gradient-to-br ${asset.gradient} text-[10px] font-medium text-oasis-ink/40`}
+                  >
+                    View {n + 2}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
