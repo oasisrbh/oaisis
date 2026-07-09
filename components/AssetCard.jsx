@@ -82,7 +82,10 @@ function OpenCard({ asset }) {
 
         {asset.status === "Live" ? (
           <div className="mt-3 flex items-center gap-1.5 rounded-xl bg-aqua-50 px-3 py-2 text-xs font-semibold text-aqua-700">
-            <Zap size={13} /> Live — accepting contributions
+            <Zap size={13} />
+            {asset.reservedUsd
+              ? `Live — ${Math.round((asset.reservedUsd / asset.poolSize) * 100)}% committed`
+              : "Live — accepting contributions"}
           </div>
         ) : (
           <div className="mt-3 flex items-center gap-1.5 rounded-xl bg-aqua-50 px-3 py-2 text-xs font-semibold text-aqua-700">

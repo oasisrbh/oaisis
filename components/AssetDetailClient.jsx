@@ -31,6 +31,7 @@ import RobinhoodChainBadge from "@/components/RobinhoodChainBadge";
 import CountdownTimer from "@/components/CountdownTimer";
 import ConnectButton from "@/components/ConnectButton";
 import ContributePanel from "@/components/ContributePanel";
+import PoolProgress from "@/components/PoolProgress";
 import { useOasisWallet } from "@/hooks/useOasisWallet";
 import { hasJoinedWaitlist, joinWaitlist } from "@/lib/waitlist";
 import { formatUsd, activity, RISKS, EXIT_PATHS, GENESIS_LAUNCH_LABEL } from "@/lib/data";
@@ -208,10 +209,13 @@ export default function AssetDetailClient({ asset }) {
                   Details unlock {GENESIS_LAUNCH_LABEL}.
                 </div>
               ) : (
-                <div className="grid grid-cols-2 gap-4">
-                  <Stat label="Pool size" value={formatUsd(asset.poolSize)} />
-                  <Stat label="Min entry" value={formatUsd(asset.minEntry)} />
-                </div>
+                <>
+                  <div className="grid grid-cols-2 gap-4">
+                    <Stat label="Pool size" value={formatUsd(asset.poolSize)} />
+                    <Stat label="Min entry" value={formatUsd(asset.minEntry)} />
+                  </div>
+                  {live && <PoolProgress asset={asset} className="mt-5" />}
+                </>
               )}
 
               <div className="mt-4 flex items-center gap-2 rounded-2xl bg-oasis-bg px-4 py-3 text-xs text-oasis-muted">

@@ -2,8 +2,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { parseEther, formatEther, isAddress } from "viem";
-import { useBalance, useSendTransaction, useWaitForTransactionReceipt } from "wagmi";
+import { parseEther, isAddress } from "viem";
+import { useSendTransaction, useWaitForTransactionReceipt } from "wagmi";
 import { ArrowUpRight, Check, Loader2, Zap } from "lucide-react";
 import { POOL_TREASURY_ADDRESS, targetChain } from "@/lib/chains";
 import { useEthPrice } from "@/hooks/useEthPrice";
@@ -34,13 +34,6 @@ export default function ContributePanel({ asset, wallet }) {
   const ethPrice = useEthPrice();
 
   const treasuryOk = POOL_TREASURY_ADDRESS && isAddress(POOL_TREASURY_ADDRESS);
-
-  // Real amount raised: the treasury wallet's onchain balance.
-  const { data: treasuryBalance } = useBalance({
-    address: treasuryOk ? POOL_TREASURY_ADDRESS : undefined,
-    chainId: targetChain.id,
-    query: { enabled: treasuryOk, refetchInterval: 30_000 },
-  });
 
   const { sendTransactionAsync, isPending: isSending } = useSendTransaction();
   const [txHash, setTxHash] = useState(null);
@@ -82,11 +75,6 @@ export default function ContributePanel({ asset, wallet }) {
   const minEth = ethPrice ? asset.minEntry / ethPrice : FALLBACK_MIN_ETH;
   const belowMin = parsedAmount !== null && Number(amount) < minEth;
 
-  const raisedEth = treasuryBalance ? Number(formatEther(treasuryBalance.value)) : null;
-  const raisedUsd = ethPrice !== null && raisedEth !== null ? raisedEth * ethPrice : null;
-  const fillPercent =
-    raisedUsd !== null ? Math.min(100, (raisedUsd / asset.poolSize) * 100) : null;
-
   const ownershipPercent =
     ethPrice && myTotalEth > 0
       ? Math.min(100, ((myTotalEth * ethPrice) / asset.poolSize) * 100)
@@ -124,28 +112,6 @@ export default function ContributePanel({ asset, wallet }) {
 
   return (
     <div className="space-y-4">
-      {/* Raised so far — real treasury balance on Robinhood Chain */}
-      <div>
-        <div className="flex items-end justify-between text-sm">
-          <p className="font-semibold text-oasis-ink">
-            {raisedEth !== null ? `${trimEth(raisedEth)} ETH raised` : "Raised onchain"}
-          </p>
-          <p className="text-xs text-oasis-muted">
-            {raisedUsd !== null
-              ? `${formatUsd(Math.round(raisedUsd))} of ${formatUsd(asset.poolSize)}`
-              : `Pool size ${formatUsd(asset.poolSize)}`}
-          </p>
-        </div>
-        <div className="mt-2 h-2 overflow-hidden rounded-full bg-oasis-bg">
-          <motion.div
-            initial={{ width: 0 }}
-            animate={{ width: `${fillPercent ?? 0}%` }}
-            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-            className="h-full rounded-full bg-aqua-400"
-          />
-        </div>
-      </div>
-
       {/* Amount input */}
       <div>
         <div className="relative">
