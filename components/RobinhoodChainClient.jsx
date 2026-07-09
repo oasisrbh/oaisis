@@ -55,18 +55,17 @@ const FLOW = [
 
 const READINESS = [
   { icon: Wallet, title: "Wallet connection", status: "Live", live: true },
-  { icon: Coins, title: "Genesis pools", status: "Launching July 26", live: true },
+  { icon: Coins, title: "Genesis pools", status: "First pool live", live: true },
   { icon: LineChart, title: "Portfolio dashboard", status: "Live", live: true },
-  { icon: Zap, title: "Ownership tracking", status: "Active after pool participation", live: false },
+  { icon: Zap, title: "Ownership tracking", status: "Live", live: true },
 ];
 
 export default function RobinhoodChainClient() {
-  const launchingCount = genesisDrops.filter((a) => a.status === "Launching Soon").length;
   const lockedCount = genesisDrops.filter((a) => a.isLocked).length;
 
   const stats = [
     { value: genesisDrops.length, label: "Genesis pools" },
-    { value: `Launching ${GENESIS_LAUNCH_LABEL.replace(", 2026", "")}`, label: "First pool" },
+    { value: "Live now", label: "First pool" },
     { value: lockedCount, label: "Locked drops" },
     { value: "Robinhood Chain", label: "Network", chain: true },
   ];
@@ -205,7 +204,7 @@ export default function RobinhoodChainClient() {
                       <Lock size={11} /> Locked
                     </span>
                   ) : (
-                    <StatusBadge status="Launching Soon" />
+                    <StatusBadge status={a.status} />
                   )}
                 </div>
               ))}
@@ -224,9 +223,9 @@ export default function RobinhoodChainClient() {
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.08 }}
           >
-            <CountdownTimer targetDate={GENESIS_LAUNCH_DATE} label="Launch opens in" />
+            <CountdownTimer targetDate={GENESIS_LAUNCH_DATE} label="Locked drops unlock in" />
             <p className="mt-3 text-center text-xs text-oasis-muted">
-              First Genesis pool opens {GENESIS_LAUNCH_LABEL}.
+              The first Genesis pool is live. Locked drops unlock {GENESIS_LAUNCH_LABEL}.
             </p>
           </motion.div>
         </div>
@@ -289,9 +288,9 @@ export default function RobinhoodChainClient() {
             <h3 className="text-lg font-bold">Genesis launch note</h3>
           </div>
           <p className="mt-3 text-sm leading-relaxed text-amber-900/80">
-            The first Oasis Genesis pool opens {GENESIS_LAUNCH_LABEL}. Pool
-            terms, custody details, and contribution information should be
-            reviewed before participating.
+            The first Oasis Genesis pool is live. Pool terms, custody details,
+            and contribution information should be reviewed before
+            participating.
           </p>
           <Link
             href="/risk"

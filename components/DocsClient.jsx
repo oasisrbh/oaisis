@@ -52,7 +52,7 @@ const QUICK = [
 const FAQS = [
   {
     q: "Is Oasis live yet?",
-    a: `Yes. Oasis is live. The first Genesis pool opens ${GENESIS_LAUNCH_LABEL}.`,
+    a: `Yes. Oasis is live and the first Genesis pool is accepting contributions. Locked drops unlock ${GENESIS_LAUNCH_LABEL}.`,
   },
   {
     q: "What does a locked drop mean?",
@@ -92,12 +92,12 @@ export default function DocsClient() {
   const [active, setActive] = useState("overview");
   const [navOpen, setNavOpen] = useState(false);
 
-  const launchingCount = genesisDrops.filter((a) => a.status === "Launching Soon").length;
+  const liveCount = genesisDrops.filter((a) => a.status === "Live").length;
   const lockedCount = genesisDrops.filter((a) => a.isLocked).length;
 
   const heroStats = [
     { value: genesisDrops.length, label: "Genesis pools" },
-    { value: launchingCount, label: "Opens July 26" },
+    { value: liveCount, label: "Live now" },
     { value: lockedCount, label: "Locked drops" },
     { value: "Robinhood", label: "Chain" },
   ];
@@ -272,8 +272,8 @@ export default function DocsClient() {
           {/* 3. Genesis drops */}
           <DocSection id="genesis-drops" eyebrow="Launch set" icon={Sparkles} title="Genesis drops">
             <p className="text-[15px] leading-relaxed text-oasis-muted">
-              One Genesis pool opens {GENESIS_LAUNCH_LABEL}. Three locked drops
-              unlock after launch.
+              The first Genesis pool is live and accepting contributions. Three
+              locked drops unlock {GENESIS_LAUNCH_LABEL}.
             </p>
             <div className="mt-5 rounded-2xl border border-oasis-line bg-oasis-bg/50 p-5">
               <p className="text-sm font-bold text-oasis-ink">Genesis launch set</p>
@@ -287,7 +287,7 @@ export default function DocsClient() {
                       {a.isLocked && <Lock size={13} className="text-oasis-muted" />}
                       {a.name}
                     </span>
-                    {a.isLocked ? <LockedBadge /> : <StatusBadge status="Launching Soon" />}
+                    {a.isLocked ? <LockedBadge /> : <StatusBadge status={a.status} />}
                   </div>
                 ))}
               </div>
@@ -297,13 +297,13 @@ export default function DocsClient() {
           {/* 4. Joining a pool */}
           <DocSection id="joining" eyebrow="Participation" icon={ListChecks} title="Joining a pool">
             <div className="space-y-3">
-              <TimelineRow n="1" title="Before launch" body="Join the waitlist or add pools to your watchlist." />
-              <TimelineRow n="2" title="At launch" body="The contribution flow opens and wallet connection is enabled." />
-              <TimelineRow n="3" title="After joining" body="Your ownership appears in the portfolio dashboard." />
+              <TimelineRow n="1" title="Connect" body="Connect your wallet on Robinhood Chain." />
+              <TimelineRow n="2" title="Contribute" body="Send your contribution onchain from the live pool page." />
+              <TimelineRow n="3" title="Track" body="Your contribution appears in the portfolio dashboard with its transaction." />
               <TimelineRow n="4" title="After settlement" body="Final ownership is confirmed." />
             </div>
             <p className="mt-4 inline-flex items-center gap-2 rounded-full bg-aqua-50 px-3 py-1.5 text-[12px] font-semibold text-aqua-700">
-              <Info size={13} /> Genesis pool opens {GENESIS_LAUNCH_LABEL}.
+              <Info size={13} /> The first Genesis pool is live now.
             </p>
           </DocSection>
 

@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import { SectionHeading, Dots, Glow, MiniLedger } from "@/components/Decor";
 import RobinhoodChainBadge from "@/components/RobinhoodChainBadge";
-import { LIFECYCLE, GENESIS_LAUNCH_LABEL } from "@/lib/data";
+import { LIFECYCLE } from "@/lib/data";
 
 // -------------------------------------------------------------- Why collectors
 const WHY = [
@@ -163,7 +163,7 @@ const CHAIN_CARDS = [
 const LEDGER = [
   { badge: "＋", color: "#c8ff00", title: "Wallet connected", meta: "Genesis dashboard", time: "2m" },
   { badge: "☆", color: "#c8ff00", title: "Watchlist added", meta: "Rolex Daytona Panda", time: "8m" },
-  { badge: "◐", color: "#8B9B6E", title: "Genesis pool opens", meta: GENESIS_LAUNCH_LABEL, time: "—" },
+  { badge: "◐", color: "#8B9B6E", title: "Genesis pool live", meta: "Rolex Daytona Panda", time: "now" },
 ];
 
 export function ChainSection() {

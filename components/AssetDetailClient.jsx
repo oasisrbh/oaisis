@@ -30,6 +30,7 @@ import StatusBadge from "@/components/StatusBadge";
 import RobinhoodChainBadge from "@/components/RobinhoodChainBadge";
 import CountdownTimer from "@/components/CountdownTimer";
 import ConnectButton from "@/components/ConnectButton";
+import ContributePanel from "@/components/ContributePanel";
 import { useOasisWallet } from "@/hooks/useOasisWallet";
 import { hasJoinedWaitlist, joinWaitlist } from "@/lib/waitlist";
 import { formatUsd, activity, RISKS, EXIT_PATHS, GENESIS_LAUNCH_LABEL } from "@/lib/data";
@@ -70,6 +71,7 @@ export default function AssetDetailClient({ asset }) {
   const [joined, setJoined] = useState(false);
   const wallet = useOasisWallet();
   const locked = !!asset.isLocked;
+  const live = asset.status === "Live" && !locked;
   const statusLabel = asset.launchDate && !locked ? `Launching ${GENESIS_LAUNCH_LABEL}` : undefined;
   const risks = asset.launchDate
     ? [...RISKS, "Launch timing may change. Final pool terms will be published before contributions open."]
@@ -212,6 +214,8 @@ export default function AssetDetailClient({ asset }) {
                     {wallet.isSwitching && <Loader2 size={16} className="animate-spin" />}
                     Switch to Robinhood Chain
                   </motion.button>
+                ) : live ? (
+                  <ContributePanel asset={asset} wallet={wallet} />
                 ) : joined ? (
                   <div className="flex items-center justify-center gap-2 rounded-full bg-aqua-50 py-3.5 text-sm font-semibold text-aqua-700">
                     <Check size={17} /> Joined Waitlist
@@ -248,6 +252,10 @@ export default function AssetDetailClient({ asset }) {
                 <p className="mt-4 text-center text-xs leading-relaxed text-oasis-muted">
                   Genesis Drop launches {GENESIS_LAUNCH_LABEL}.
                 </p>
+              ) : live ? (
+                <p className="mt-4 text-center text-xs leading-relaxed text-oasis-muted">
+                  Pool is live. Contributions settle onchain on Robinhood Chain.
+                </p>
               ) : (
                 <p className="mt-4 text-center text-xs leading-relaxed text-oasis-muted">
                   Genesis pool opens {GENESIS_LAUNCH_LABEL}.
@@ -272,7 +280,9 @@ export default function AssetDetailClient({ asset }) {
             : [
                 { label: "Pool size", value: formatUsd(asset.poolSize) },
                 { label: "Min entry", value: formatUsd(asset.minEntry) },
-                { label: "Launch date", value: GENESIS_LAUNCH_LABEL },
+                live
+                  ? { label: "Status", value: "Live" }
+                  : { label: "Launch date", value: GENESIS_LAUNCH_LABEL },
                 { label: "Chain", value: "Robinhood" },
               ]
           ).map((c) => (

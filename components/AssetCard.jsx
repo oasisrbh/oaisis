@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { ArrowUpRight, Lock, Calendar } from "lucide-react";
+import { ArrowUpRight, Lock, Calendar, Zap } from "lucide-react";
 import AssetVisual from "@/components/AssetVisual";
 import StatusBadge from "@/components/StatusBadge";
 import RobinhoodChainBadge from "@/components/RobinhoodChainBadge";
@@ -80,14 +80,20 @@ function OpenCard({ asset }) {
           </div>
         </div>
 
-        <div className="mt-3 flex items-center gap-1.5 rounded-xl bg-aqua-50 px-3 py-2 text-xs font-semibold text-aqua-700">
-          <Calendar size={13} /> Launching {GENESIS_LAUNCH_LABEL}
-        </div>
+        {asset.status === "Live" ? (
+          <div className="mt-3 flex items-center gap-1.5 rounded-xl bg-aqua-50 px-3 py-2 text-xs font-semibold text-aqua-700">
+            <Zap size={13} /> Live — accepting contributions
+          </div>
+        ) : (
+          <div className="mt-3 flex items-center gap-1.5 rounded-xl bg-aqua-50 px-3 py-2 text-xs font-semibold text-aqua-700">
+            <Calendar size={13} /> Launching {GENESIS_LAUNCH_LABEL}
+          </div>
+        )}
 
         <div className="mt-auto flex items-center justify-between border-t border-oasis-line pt-4">
           <span className="text-xs text-oasis-muted">Genesis pool</span>
           <span className="pill bg-oasis-sand px-3.5 py-1.5 text-xs font-semibold text-oasis-ink transition-colors group-hover:bg-aqua-400 group-hover:text-oasis-ink">
-            View Pool
+            {asset.status === "Live" ? "Contribute" : "View Pool"}
           </span>
         </div>
       </div>

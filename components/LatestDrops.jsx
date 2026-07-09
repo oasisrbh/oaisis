@@ -17,11 +17,11 @@ export default function LatestDrops() {
     return genesisDrops.filter((a) => a.category === tab);
   }, [tab]);
 
-  const launchingCount = genesisDrops.filter((a) => a.status === "Launching Soon").length;
+  const liveCount = genesisDrops.filter((a) => a.status === "Live").length;
   const lockedCount = genesisDrops.filter((a) => a.isLocked).length;
   const stats = [
     { value: genesisDrops.length, label: "Genesis pools" },
-    { value: launchingCount, label: "Launching soon" },
+    { value: liveCount, label: "Live now" },
     { value: lockedCount, label: "Locked" },
     { value: "Robinhood", label: "Chain", chain: true },
   ];
@@ -37,8 +37,8 @@ export default function LatestDrops() {
           First Oasis pools
         </h2>
         <p className="mt-3 text-[15px] leading-relaxed text-oasis-muted">
-          First Genesis pool launches {GENESIS_LAUNCH_LABEL}. Three locked drops
-          unlock after launch. Built for rare asset ownership on Robinhood Chain.
+          The first Genesis pool is live. Three locked drops unlock{" "}
+          {GENESIS_LAUNCH_LABEL}. Built for rare asset ownership on Robinhood Chain.
         </p>
       </div>
 

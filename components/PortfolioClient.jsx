@@ -21,7 +21,10 @@ import {
 import StatusBadge from "@/components/StatusBadge";
 import CountdownTimer from "@/components/CountdownTimer";
 import { useOasisWallet } from "@/hooks/useOasisWallet";
+import { useEthPrice } from "@/hooks/useEthPrice";
 import { hasJoinedWaitlist, joinWaitlist } from "@/lib/waitlist";
+import { getPositions } from "@/lib/positions";
+import { targetChain } from "@/lib/chains";
 import ConnectButton from "@/components/ConnectButton";
 import BrandLogo from "@/components/BrandLogo";
 import {
@@ -47,13 +50,13 @@ export default function PortfolioClient() {
   const wallet = useOasisWallet();
   if (!wallet.isConnected) return <NotConnected />;
 
-  const launchingCount = genesisDrops.filter((a) => a.status === "Launching Soon").length;
+  const liveCount = genesisDrops.filter((a) => a.status === "Live").length;
   const lockedCount = genesisDrops.filter((a) => a.isLocked).length;
 
   const stats = [
     { icon: Wallet, label: "Wallet status", value: "Connected" },
     { icon: Layers, label: "Genesis pools", value: genesisDrops.length },
-    { icon: Clock, label: "Opening soon", value: launchingCount },
+    { icon: Clock, label: "Live pools", value: liveCount },
     { icon: Lock, label: "Locked drops", value: lockedCount },
     { icon: Heart, label: "Watchlist", value: genesisDrops.length },
   ];
@@ -74,7 +77,7 @@ export default function PortfolioClient() {
               Your Oasis portfolio
             </h1>
             <span className="pill gap-1.5 bg-aqua-400 px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-oasis-ink">
-              <Calendar size={12} /> Genesis launches {GENESIS_LAUNCH_LABEL}
+              <Calendar size={12} /> First Genesis pool is live
             </span>
           </div>
           <p className="mt-2 max-w-xl text-sm text-oasis-muted">
@@ -87,7 +90,7 @@ export default function PortfolioClient() {
             <span className="h-2 w-2 rounded-full bg-aqua-400" /> {wallet.shortAddress}
           </span>
           <div className="w-full sm:w-[300px]">
-            <CountdownTimer targetDate={GENESIS_LAUNCH_DATE} label="Genesis launches in" />
+            <CountdownTimer targetDate={GENESIS_LAUNCH_DATE} label="Locked drops unlock in" />
           </div>
         </div>
       </motion.div>
@@ -96,7 +99,7 @@ export default function PortfolioClient() {
         <div className="mt-6 flex flex-col gap-2.5 rounded-2xl border border-amber-200 bg-amber-50 p-4 sm:flex-row sm:items-center sm:justify-between">
           <p className="flex items-center gap-2 text-sm font-semibold text-amber-800">
             <AlertTriangle size={16} className="flex-none" />
-            Switch to {wallet.targetChain.name} to join a Genesis waitlist.
+            Switch to {wallet.targetChain.name} to contribute to live pools.
           </p>
           <button
             onClick={wallet.switchToRobinhoodChain}
@@ -120,7 +123,7 @@ export default function PortfolioClient() {
       <div className="mt-6 grid gap-5 lg:grid-cols-[320px_1fr_340px]">
         <ContributionEstimate wallet={wallet} />
         <GenesisPoolStatus wallet={wallet} />
-        <OwnershipAllocation />
+        <OwnershipAllocation wallet={wallet} />
       </div>
 
       {/* Completed pools — empty state */}
@@ -184,7 +187,7 @@ export default function PortfolioClient() {
                       <ArrowUpRight size={14} className="text-oasis-muted opacity-0 transition group-hover:opacity-100" />
                     )}
                   </p>
-                  {a.isLocked ? <LockedBadge /> : <StatusBadge status="Launching Soon" />}
+                  {a.isLocked ? <LockedBadge /> : <StatusBadge status={a.status} />}
                 </>
               );
               return a.isLocked ? (
@@ -304,6 +307,13 @@ function ContributionEstimate({ wallet }) {
           {wallet.isSwitching && <Loader2 size={15} className="animate-spin" />}
           Switch to Robinhood Chain
         </button>
+      ) : asset.status === "Live" ? (
+        <Link
+          href={`/drops/${asset.id}`}
+          className="mt-4 flex w-full items-center justify-center gap-2 rounded-full bg-aqua-400 py-3 text-sm font-bold text-oasis-ink transition hover:brightness-105"
+        >
+          Contribute <ArrowRight size={15} />
+        </Link>
       ) : joined ? (
         <div className="mt-4 flex items-center justify-center gap-2 rounded-full bg-aqua-50 py-3 text-sm font-semibold text-aqua-700">
           <Check size={15} /> Joined Waitlist
@@ -318,7 +328,9 @@ function ContributionEstimate({ wallet }) {
       )}
       <p className="mt-3 text-center text-[11px] text-oasis-muted">
         Estimate only. Final ownership is confirmed after pool settlement.
-        Genesis pool opens {GENESIS_LAUNCH_LABEL}.
+        {asset.status === "Live"
+          ? " This pool is live and accepting contributions."
+          : ` Genesis pool opens ${GENESIS_LAUNCH_LABEL}.`}
       </p>
     </motion.div>
   );
@@ -369,20 +381,24 @@ function GenesisPoolStatus({ wallet }) {
                       <Check size={10} /> Joined
                     </span>
                   )}
-                  <StatusBadge status="Launching Soon" />
+                  <StatusBadge status={a.status} />
                 </div>
               </div>
               <div className="mt-3 flex flex-wrap items-center gap-x-6 gap-y-2">
                 <div>
-                  <p className="text-[10px] uppercase tracking-wide text-oasis-muted">Launches</p>
-                  <p className="text-sm font-bold text-oasis-ink">{GENESIS_LAUNCH_LABEL}</p>
+                  <p className="text-[10px] uppercase tracking-wide text-oasis-muted">
+                    {a.status === "Live" ? "Status" : "Launches"}
+                  </p>
+                  <p className="text-sm font-bold text-oasis-ink">
+                    {a.status === "Live" ? "Accepting contributions" : GENESIS_LAUNCH_LABEL}
+                  </p>
                 </div>
                 <div>
                   <p className="text-[10px] uppercase tracking-wide text-oasis-muted">Pool size</p>
                   <p className="text-sm font-bold text-oasis-ink">{formatUsd(a.poolSize)}</p>
                 </div>
                 <span className="pill ml-auto bg-oasis-sand px-3.5 py-1.5 text-xs font-semibold text-oasis-ink transition group-hover:bg-aqua-400">
-                  View Pool
+                  {a.status === "Live" ? "Contribute" : "View Pool"}
                 </span>
               </div>
             </Link>
@@ -393,8 +409,25 @@ function GenesisPoolStatus({ wallet }) {
   );
 }
 
-// -------------------------------------------------- ownership allocation (empty)
-function OwnershipAllocation() {
+// ----------------------------------------------------- ownership allocation
+// Shows real positions (confirmed onchain contributions) when they exist;
+// otherwise the honest empty state.
+function OwnershipAllocation({ wallet }) {
+  const [positions, setPositions] = useState([]);
+  const ethPrice = useEthPrice();
+
+  useEffect(() => {
+    setPositions(getPositions(wallet.address));
+  }, [wallet.address]);
+
+  // Aggregate contributions per pool.
+  const byPool = positions.reduce((acc, p) => {
+    acc[p.poolId] = (acc[p.poolId] || 0) + (Number(p.amountEth) || 0);
+    return acc;
+  }, {});
+  const held = genesisDrops.filter((a) => byPool[a.id] > 0);
+  const explorerBase = targetChain.blockExplorers?.default?.url;
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -406,28 +439,71 @@ function OwnershipAllocation() {
       <div className="relative">
         <h3 className="text-lg font-bold">Ownership allocation</h3>
 
-        <div className="mt-6 flex flex-col items-center text-center">
-          <div className="flex h-16 w-16 items-center justify-center rounded-2xl border border-aqua-400/20 bg-oasis-dark/70">
-            <BrandLogo variant="icon" size="md" />
+        {held.length > 0 ? (
+          <div className="mt-5 space-y-3">
+            {held.map((a, i) => {
+              const eth = byPool[a.id];
+              const pct = ethPrice ? Math.min(100, ((eth * ethPrice) / a.poolSize) * 100) : null;
+              return (
+                <div key={a.id} className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="flex items-center gap-2 text-sm font-semibold">
+                      <span
+                        className="h-2.5 w-2.5 flex-none rounded-full"
+                        style={{ backgroundColor: SEGMENT_COLORS[i % SEGMENT_COLORS.length] }}
+                      />
+                      {a.name}
+                    </span>
+                    {pct !== null && (
+                      <span className="text-xs font-bold text-aqua-300">≈ {pct.toFixed(2)}%</span>
+                    )}
+                  </div>
+                  <p className="mt-2 text-xs text-white/55">
+                    {Number(eth.toFixed(4))} ETH contributed onchain
+                  </p>
+                </div>
+              );
+            })}
+            <p className="text-[11px] leading-relaxed text-white/45">
+              Ownership percentages are estimates until pool settlement.
+            </p>
+            {explorerBase && wallet.address && (
+              <a
+                href={`${explorerBase}/address/${wallet.address}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 text-xs font-semibold text-aqua-300 transition hover:text-aqua-200"
+              >
+                View transactions on explorer <ArrowUpRight size={13} />
+              </a>
+            )}
           </div>
-          <p className="mt-4 text-base font-bold">No ownership positions yet</p>
-          <p className="mt-1 text-sm leading-relaxed text-white/55">
-            Positions appear here after you participate in an open pool.
-          </p>
-        </div>
-
-        {/* faint segments — names only, no percentages */}
-        <div className="mt-6 space-y-2.5 border-t border-white/10 pt-5">
-          {genesisDrops.map((a, i) => (
-            <div key={a.id} className="flex items-center gap-2.5 opacity-40">
-              <span
-                className="h-2.5 w-2.5 rounded-full"
-                style={{ backgroundColor: SEGMENT_COLORS[i % SEGMENT_COLORS.length] }}
-              />
-              <span className="text-sm text-white/70">{a.name}</span>
+        ) : (
+          <>
+            <div className="mt-6 flex flex-col items-center text-center">
+              <div className="flex h-16 w-16 items-center justify-center rounded-2xl border border-aqua-400/20 bg-oasis-dark/70">
+                <BrandLogo variant="icon" size="md" />
+              </div>
+              <p className="mt-4 text-base font-bold">No ownership positions yet</p>
+              <p className="mt-1 text-sm leading-relaxed text-white/55">
+                Positions appear here after you contribute to a live pool.
+              </p>
             </div>
-          ))}
-        </div>
+
+            {/* faint segments — names only, no percentages */}
+            <div className="mt-6 space-y-2.5 border-t border-white/10 pt-5">
+              {genesisDrops.map((a, i) => (
+                <div key={a.id} className="flex items-center gap-2.5 opacity-40">
+                  <span
+                    className="h-2.5 w-2.5 rounded-full"
+                    style={{ backgroundColor: SEGMENT_COLORS[i % SEGMENT_COLORS.length] }}
+                  />
+                  <span className="text-sm text-white/70">{a.name}</span>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
       </div>
     </motion.div>
   );

@@ -9,9 +9,9 @@ import ChainGuard from "@/components/ChainGuard";
 import { genesisDrops, GENESIS_LAUNCH_LABEL } from "@/lib/data";
 
 const CATEGORY_FILTERS = ["All", "Watches", "Sneakers", "Bags"];
-const STATUS_FILTERS = ["All", "Launching Soon", "Locked"];
+const STATUS_FILTERS = ["All", "Live", "Locked"];
 const TYPE_FILTERS = ["All", ...Array.from(new Set(genesisDrops.map((a) => a.assetType)))];
-const SORTS = ["Featured", "Launching first", "Locked first"];
+const SORTS = ["Featured", "Live first", "Locked first"];
 
 function FilterGroup({ title, options, value, onChange }) {
   return (
@@ -63,17 +63,17 @@ export default function ExploreClient() {
       );
     }
 
-    if (sort === "Launching first") list.sort((a, b) => Number(a.isLocked) - Number(b.isLocked));
+    if (sort === "Live first") list.sort((a, b) => Number(a.isLocked) - Number(b.isLocked));
     else if (sort === "Locked first") list.sort((a, b) => Number(b.isLocked) - Number(a.isLocked));
     // "Featured" keeps the curated genesis order
     return list;
   }, [q, cat, status, type, sort]);
 
-  const launchingCount = genesisDrops.filter((a) => a.status === "Launching Soon").length;
+  const liveCount = genesisDrops.filter((a) => a.status === "Live").length;
   const lockedCount = genesisDrops.filter((a) => a.isLocked).length;
   const stats = [
     { value: genesisDrops.length, label: "Genesis pools" },
-    { value: launchingCount, label: `Launching ${GENESIS_LAUNCH_LABEL.replace(", 2026", "")}` },
+    { value: liveCount, label: "Live now" },
     { value: lockedCount, label: "Locked drops" },
     { value: "Robinhood", label: "Chain", chain: true },
   ];
@@ -104,8 +104,8 @@ export default function ExploreClient() {
             Genesis RWA pools
           </h1>
           <p className="mt-4 text-[15px] leading-relaxed text-oasis-muted">
-            One Genesis pool opens {GENESIS_LAUNCH_LABEL}. Three locked drops will
-            unlock after launch.
+            The first Genesis pool is live and accepting contributions. Three
+            locked drops unlock {GENESIS_LAUNCH_LABEL}.
           </p>
         </div>
 

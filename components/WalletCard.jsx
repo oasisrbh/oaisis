@@ -94,7 +94,7 @@ export default function WalletCard() {
             </div>
 
             <div className="mt-4">
-              <CountdownTimer targetDate={GENESIS_LAUNCH_DATE} label="Genesis launches in" />
+              <CountdownTimer targetDate={GENESIS_LAUNCH_DATE} label="Locked drops unlock in" />
             </div>
 
             <a

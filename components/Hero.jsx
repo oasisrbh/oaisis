@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { ArrowRight, Sparkles, Layers, Calendar } from "lucide-react";
+import { ArrowRight, Sparkles, Layers, Zap } from "lucide-react";
 import WalletCard from "@/components/WalletCard";
 import RobinhoodChainBadge from "@/components/RobinhoodChainBadge";
 import { Dots, Glow } from "@/components/Decor";
@@ -15,7 +15,7 @@ export default function Hero() {
   const meta = [
     { label: "Pool size", value: formatUsd(item.poolSize) },
     { label: "Min entry", value: formatUsd(item.minEntry) },
-    { label: "Launches", value: GENESIS_LAUNCH_LABEL },
+    { label: "Status", value: item.status === "Live" ? "Live" : GENESIS_LAUNCH_LABEL },
     { label: "Chain", value: "Robinhood" },
   ];
 
@@ -74,7 +74,7 @@ export default function Hero() {
                 <RobinhoodChainBadge
                   variant="lime"
                   size="md"
-                  label="Launching on Robinhood Chain"
+                  label="Live on Robinhood Chain"
                   className="uppercase tracking-wide"
                 />
                 <span className="pill gap-1.5 bg-oasis-ink px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-aqua-400">
@@ -106,7 +106,7 @@ export default function Hero() {
               </div>
 
               <p className="mt-4 flex items-center gap-1.5 text-xs font-semibold text-oasis-ink/70">
-                <Calendar size={13} /> First Genesis Drop: {GENESIS_LAUNCH_LABEL}
+                <Zap size={13} /> First Genesis pool is live — locked drops unlock {GENESIS_LAUNCH_LABEL}
               </p>
 
               {/* Metadata row */}
