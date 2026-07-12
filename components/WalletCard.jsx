@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Check, ArrowRight, Layers, Heart } from "lucide-react";
+import { Check, ArrowRight, Layers, Heart, Zap } from "lucide-react";
 import { useOasisWallet } from "@/hooks/useOasisWallet";
 import ConnectButton from "@/components/ConnectButton";
 import RobinhoodChainBadge from "@/components/RobinhoodChainBadge";
@@ -68,6 +68,16 @@ export default function WalletCard() {
             <div className="mt-5">
               <ConnectButton variant="cyan" className="w-full py-3 text-[15px]" />
             </div>
+
+            <a
+              href="/#presale"
+              className="group mt-3 flex items-center justify-between gap-2 rounded-xl border border-aqua-400/30 bg-aqua-400/10 px-4 py-3 transition hover:border-aqua-400/60"
+            >
+              <span className="flex items-center gap-2 text-sm font-semibold text-aqua-300">
+                <Zap size={15} /> $OASIS presale is live
+              </span>
+              <ArrowRight size={15} className="text-aqua-300 transition-transform group-hover:translate-x-0.5" />
+            </a>
           </>
         ) : (
           <>
