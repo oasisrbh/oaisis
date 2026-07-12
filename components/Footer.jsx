@@ -1,5 +1,6 @@
 import Link from "next/link";
 import RobinhoodChainBadge from "@/components/RobinhoodChainBadge";
+import FooterPresaleAddress from "@/components/FooterPresaleAddress";
 
 const COLUMNS = [
   {
@@ -53,6 +54,7 @@ export default function Footer() {
                 label="Launching on Robinhood Chain"
                 className="mt-5"
               />
+              <FooterPresaleAddress className="mt-5" />
             </div>
 
             {COLUMNS.map((col) => (
