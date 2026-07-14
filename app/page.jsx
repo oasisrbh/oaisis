@@ -1,6 +1,5 @@
 import Hero from "@/components/Hero";
 import LatestDrops from "@/components/LatestDrops";
-import PresaleSection from "@/components/PresaleSection";
 import {
   WhyCollectors,
   HowItWorks,
@@ -13,7 +12,6 @@ export default function HomePage() {
     <div className="pb-10">
       <Hero />
       <LatestDrops />
-      <PresaleSection />
       <WhyCollectors />
       <HowItWorks />
       <Lifecycle />

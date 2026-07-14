@@ -14,7 +14,6 @@ import { useOasisWallet } from "@/hooks/useOasisWallet";
 const NAV = [
   { label: "Home", href: "/" },
   { label: "Drops", href: "/drops" },
-  { label: "Presale", href: "/#presale" },
   { label: "About", href: "/about" },
 ];
 

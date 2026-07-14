@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { ArrowRight, Sparkles, Zap } from "lucide-react";
+import { ArrowRight, Sparkles, Layers, Zap } from "lucide-react";
 import WalletCard from "@/components/WalletCard";
 import RobinhoodChainBadge from "@/components/RobinhoodChainBadge";
 import { Dots, Glow } from "@/components/Decor";
@@ -92,27 +92,22 @@ export default function Hero() {
 
               <div className="mt-6 flex flex-wrap items-center gap-3">
                 <Link
-                  href="/#presale"
-                  className="pill gap-2 bg-aqua-400 px-5 py-3 text-sm font-bold text-oasis-ink transition hover:-translate-y-0.5 hover:shadow-glow"
-                >
-                  <Zap size={15} /> Join $OASIS Presale <ArrowRight size={16} />
-                </Link>
-                <Link
                   href="/drops"
-                  className="pill gap-2 border border-oasis-charcoal bg-oasis-ink px-5 py-3 text-sm font-semibold text-white transition hover:text-aqua-400"
+                  className="pill gap-2 bg-aqua-400 px-5 py-3 text-sm font-bold text-oasis-ink transition hover:-translate-y-0.5 hover:shadow-glow"
                 >
                   Explore Drops <ArrowRight size={16} />
                 </Link>
+                <Link
+                  href="#how-it-works"
+                  className="pill gap-2 border border-oasis-charcoal bg-oasis-ink px-5 py-3 text-sm font-semibold text-white transition hover:text-aqua-400"
+                >
+                  <Layers size={15} /> How it works
+                </Link>
               </div>
 
-              <Link
-                href="/#presale"
-                className="group mt-4 flex items-center gap-2 text-xs font-semibold text-oasis-ink/70 transition hover:text-oasis-ink"
-              >
-                <Zap size={13} className="text-aqua-600" />
-                Presale live — deposit ETH on Robinhood Chain to claim your $OASIS
-                <ArrowRight size={13} className="transition-transform group-hover:translate-x-0.5" />
-              </Link>
+              <p className="mt-4 flex items-center gap-1.5 text-xs font-semibold text-oasis-ink/70">
+                <Zap size={13} /> First Genesis pool is live — locked drops unlock {GENESIS_LAUNCH_LABEL}
+              </p>
 
               {/* Metadata row */}
               <div className="mt-5 grid max-w-md grid-cols-2 gap-2 rounded-2xl border border-white/60 bg-white/50 p-3 backdrop-blur sm:grid-cols-4">
